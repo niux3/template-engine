@@ -7,24 +7,24 @@
 afficher la variable telle quelle :
 
 ```
-{%- .... %}
+[[- .... ]]
 ```
 
 afficher la variable échappée : 
 
 ```
-{%= .... %}
+[[= .... ]]
 ```
 
 une expression JS :
 
 ```
-{% .... %}
+[[ .... ]]
 ```
 
 À noter que si par exemple, on doit utiliser la méthode [Array.join()](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/join), on doit faire : 
 
 ```
-{%- ['a', 'b'].join(', ') %}
+[[- ['a', 'b'].join(', ') ]]
 ```
 

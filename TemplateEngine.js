@@ -14,16 +14,16 @@ export class TemplateEngine {
     }
 
     #tokenize(template) {
-        let regex = /{%=?-?([\s\S]+?)%}|([^{%]+)/g,
+        let regex = /\[\[=?-?([\s\S]+?)\]\]|([^\[]+)/g,
             match,
             tokens = []
 
         while ((match = regex.exec(template)) !== null) {
             if (match[1]) {
                 let code = match[1].trim()
-                if (match[0].startsWith("{%=")) {
+                if (match[0].startsWith("[[=")) {
                     tokens.push({ type: "OUTPUT_ESCAPED", value: code })
-                } else if (match[0].startsWith("{%-")) {
+                } else if (match[0].startsWith("[[-")) {
                     tokens.push({ type: "OUTPUT_RAW", value: code })
                 } else {
                     tokens.push({ type: "JS_CODE", value: code })
