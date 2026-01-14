@@ -1,72 +1,51 @@
 export class TemplateEngine {
-    #template = ''
-    #tokens = []
-    #escape = {}
+  #cache = new Map()
+  #maxCache = 100
+  #escape = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
+  #escapeRe = /[&<>"']/g
 
-    constructor() {
-        this.#escape = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;',
-        }
+  #escapeHTML = str => String(str).replace(this.#escapeRe, m => this.#escape[m])
+
+  #compile(tpl) {
+    if (this.#cache.has(tpl)) return this.#cache.get(tpl)
+
+    const re = /\[\[=?-?([\s\S]+?)\]\]|([^\[]+)/g
+    let m, code = 'let output="";\n'
+
+    while ((m = re.exec(tpl))) {
+      if (m[1]) {
+        const c = m[1].trim(), pre = m[0].slice(0, 3)
+        code += pre === '[[=' ? `output+=escapeHTML(${c});\n` : pre === '[[-' ? `output+=${c};\n` : `${c}\n`
+      } else if (m[2]) {
+        code += `output+=${JSON.stringify(m[2])};\n`
+      }
     }
 
-    #tokenize(template) {
-        let regex = /\[\[=?-?([\s\S]+?)\]\]|([^\[]+)/g,
-            match,
-            tokens = []
+    code += 'return output;'
 
-        while ((match = regex.exec(template)) !== null) {
-            if (match[1]) {
-                let code = match[1].trim()
-                if (match[0].startsWith("[[=")) {
-                    tokens.push({ type: "OUTPUT_ESCAPED", value: code })
-                } else if (match[0].startsWith("[[-")) {
-                    tokens.push({ type: "OUTPUT_RAW", value: code })
-                } else {
-                    tokens.push({ type: "JS_CODE", value: code })
-                }
-            } else if (match[2]) {
-                tokens.push({ type: "TEXT", value: match[2] })
-            }
-        }
+    try {
+      const fn = new Function('data', 'escapeHTML', `with(data){${code}}`)
 
-        return tokens
+      if (this.#cache.size >= this.#maxCache) {
+        this.#cache.delete(this.#cache.keys().next().value)
+      }
+
+      this.#cache.set(tpl, fn)
+      return fn
+    } catch (err) {
+      throw new Error(`Template compilation failed: ${err.message}`)
     }
+  }
 
-    #compile(template) {
-        let code = `let output = ""; \n`,
-            escapeHTML = str => String(str).replace(/[&<>"']/g, (match) => {
-                return this.#escape[match] || match
-            })
-        this.#tokens = this.#tokenize(template)
-        this.#tokens.forEach(token => {
-            switch (token.type) {
-                case "TEXT":
-                    code += `output += ${JSON.stringify(token.value)};\n`
-                    break
-                case "OUTPUT_ESCAPED":
-                    code += `output += escapeHTML(${token.value});\n`
-                    break
-                case "OUTPUT_RAW":
-                    code += `output += ${token.value};\n`
-                    break
-                case "JS_CODE":
-                    code += `${token.value}\n`
-                    break
-            }
-        })
+  render(tpl, data = {}) {
+    if (!tpl) throw new Error('Template required')
 
-        code += `return output;`
-        return new Function("data", "escapeHTML", `with(data) { ${code} }`)
+    try {
+      return this.#compile(tpl)(data, this.#escapeHTML)
+    } catch (err) {
+      throw new Error(`Template render failed: ${err.message}`)
     }
+  }
 
-    render(template, data) {
-        let renderFunction = this.#compile(template)
-        return renderFunction(data, str => str.replace(/[&<>"']/g, match => {
-            return this.#escape[match] || match
-        }))
-    }
+  clear() { this.#cache.clear() }
 }
