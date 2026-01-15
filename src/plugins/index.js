@@ -1,0 +1,5 @@
+export { PartialsPlugin } from './partials.js'
+export { HelpersPlugin } from './helpers.js'
+export { StrictModePlugin } from './strict.js'
+export { AsyncPlugin } from './async.js'
+export { I18nPlugin } from './i18n.js'

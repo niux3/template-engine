@@ -1,0 +1,19 @@
+{
+  "name": "template-engine",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@vitest/ui": "4.0.17",
+    "vite": "^7.2.4",
+    "vitest": "^4.0.17"
+  }
+}

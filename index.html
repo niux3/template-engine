@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/gears.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>template-engine</title>
+  </head>
+  <body>
     <div id="target_a"></div>
     <div id="target_b"></div>
     <script id="tplIndexPosts" type="text/template">
@@ -34,7 +34,7 @@
     </script>
     <script id="tplUsersList" type="text/template">
         <table cellspacing='0' cellpadding='0' border='1'>
-            [[ for(let [ index, user ] of Object.entries(users)){ 
+            [[ for(let [ index, user ] of Object.entries(users)){
                 let id = parseInt(index, 10) + 1
             ]]
                 <tr>
@@ -45,7 +45,7 @@
             [[ } ]]
         </table>
     </script>
-    <script type="module" src="TemplateEngine.js"></script>
-    <script type="module" src="app.js"></script>
-</body>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>
