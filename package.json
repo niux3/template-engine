@@ -1,18 +1,84 @@
 {
-  "name": "template-engine",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@niux3/template-engine",
+  "version": "1.0.0",
+  "description": "Ultra-lightweight JavaScript template engine with automatic HTML escaping, intelligent caching, and optional plugins (~520 bytes gzipped)",
   "type": "module",
+  "main": "./dist/template-engine.js",
+  "module": "./dist/template-engine.js",
+  "exports": {
+    ".": {
+      "import": "./dist/template-engine.js",
+      "default": "./dist/template-engine.js"
+    },
+    "./plugins": {
+      "import": "./dist/plugins/index.js",
+      "default": "./dist/plugins/index.js"
+    },
+    "./plugins/partials": {
+      "import": "./dist/plugins/partials.js",
+      "default": "./dist/plugins/partials.js"
+    },
+    "./plugins/helpers": {
+      "import": "./dist/plugins/helpers.js",
+      "default": "./dist/plugins/helpers.js"
+    },
+    "./plugins/strict": {
+      "import": "./dist/plugins/strict.js",
+      "default": "./dist/plugins/strict.js"
+    },
+    "./plugins/i18n": {
+      "import": "./dist/plugins/i18n.js",
+      "default": "./dist/plugins/i18n.js"
+    },
+    "./plugins/async": {
+      "import": "./dist/plugins/async.js",
+      "default": "./dist/plugins/async.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "dev": "vite",
     "build": "vite build",
+    "prepublishOnly": "npm run build && npm test",
+    "dev": "vite",
     "preview": "vite preview"
   },
+  "keywords": [
+    "template",
+    "template-engine",
+    "templating",
+    "lightweight",
+    "tiny",
+    "html",
+    "rendering",
+    "escaping",
+    "plugin",
+    "modular",
+    "cache",
+    "partials",
+    "helpers",
+    "i18n"
+  ],
+  "author": "niux3",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/niux3/template-engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/niux3/template-engine/issues"
+  },
+  "homepage": "https://github.com/niux3/template-engine#readme",
   "devDependencies": {
     "@vitest/ui": "4.0.17",
+    "terser": "^5.45.0",
     "vite": "^7.2.4",
     "vitest": "^4.0.17"
   }
