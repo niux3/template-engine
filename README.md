@@ -1,6 +1,11 @@
 # TemplateEngine
 
-Ultra-lightweight JavaScript template engine with automatic HTML escaping, intelligent caching, and optional plugins.
+[![npm version](https://img.shields.io/npm/v/@niuxe/template-engine.svg)](https://www.npmjs.com/package/@niuxe/template-engine)
+[![npm downloads](https://img.shields.io/npm/dm/@niuxe/template-engine.svg)](https://www.npmjs.com/package/@niuxe/template-engine)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@niuxe/template-engine)](https://bundlephobia.com/package/@niuxe/template-engine)
+[![GitHub stars](https://img.shields.io/github/stars/niux3/template-engine.svg?style=social)](https://github.com/niux3/template-engine)
+
+> Ultra-lightweight JavaScript template engine with automatic HTML escaping, intelligent caching, and optional plugins.
 
 **~950 bytes gzipped (core)** | Zero dependencies | ES6+ | Modular
 
