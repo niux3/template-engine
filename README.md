@@ -21,11 +21,11 @@
 ## Installation
 
 ```bash
-npm install @niux3/template-engine
+npm install @niuxe/template-engine
 ```
 
 ```javascript
-import { TemplateEngine } from '@niux3/template-engine'
+import { TemplateEngine } from '@niuxe/template-engine'
 ```
 
 ## Quick Start
@@ -91,8 +91,8 @@ TemplateEngine uses a modular plugin system. Import only what you need to keep y
 Reusable template fragments.
 
 ```javascript
-import { TemplateEngine } from 'template-engine'
-import { PartialsPlugin } from 'template-engine/plugins/partials'
+import { TemplateEngine } from '@niuxe/template-engine'
+import { PartialsPlugin } from '@niuxe/template-engine/plugins/partials'
 
 const engine = new TemplateEngine().use(PartialsPlugin)
 
@@ -113,8 +113,8 @@ const html = engine.render(`
 Custom functions for formatting and transforming data.
 
 ```javascript
-import { TemplateEngine } from 'template-engine'
-import { HelpersPlugin } from 'template-engine/plugins/helpers'
+import { TemplateEngine } from '@niuxe/template-engine'
+import { HelpersPlugin } from '@niuxe/template-engine/plugins/helpers'
 
 const engine = new TemplateEngine().use(HelpersPlugin)
 
@@ -135,8 +135,8 @@ const html = engine.render(`
 Throws errors when accessing undefined variables, helping catch typos and missing data.
 
 ```javascript
-import { TemplateEngine } from 'template-engine'
-import { StrictModePlugin } from 'template-engine/plugins/strict'
+import { TemplateEngine } from '@niuxe/template-engine'
+import { StrictModePlugin } from '@niuxe/template-engine/plugins/strict'
 
 const engine = new TemplateEngine().use(StrictModePlugin)
 
@@ -156,8 +156,8 @@ Perfect for catching refactoring errors and validating API responses.
 Multi-language support with variable interpolation.
 
 ```javascript
-import { TemplateEngine } from 'template-engine'
-import { I18nPlugin } from 'template-engine/plugins/i18n'
+import { TemplateEngine } from '@niuxe/template-engine'
+import { I18nPlugin } from '@niuxe/template-engine/plugins/i18n'
 
 const engine = new TemplateEngine().use(I18nPlugin)
 
@@ -195,8 +195,8 @@ const html = engine.render(`
 Read and render templates from files (Node.js only).
 
 ```javascript
-import { TemplateEngine } from 'template-engine'
-import { AsyncPlugin } from 'template-engine/plugins/async'
+import { TemplateEngine } from '@niuxe/template-engine'
+import { AsyncPlugin } from '@niuxe/template-engine/plugins/async'
 
 const engine = new TemplateEngine().use(AsyncPlugin)
 
@@ -214,8 +214,8 @@ const html = await engine.renderFile('./templates/email.html', {
 Plugins can be chained together:
 
 ```javascript
-import { TemplateEngine } from 'template-engine'
-import { PartialsPlugin, HelpersPlugin, StrictModePlugin, I18nPlugin } from 'template-engine/plugins'
+import { TemplateEngine } from '@niuxe/template-engine'
+import { PartialsPlugin, HelpersPlugin, StrictModePlugin, I18nPlugin } from '@niuxe/template-engine/plugins'
 
 const engine = new TemplateEngine()
   .use(PartialsPlugin)
@@ -285,8 +285,8 @@ Useful when:
 ### Multilingual Website with I18n
 
 ```javascript
-import { TemplateEngine } from 'template-engine'
-import { I18nPlugin, HelpersPlugin } from 'template-engine/plugins'
+import { TemplateEngine } from '@niuxe/template-engine'
+import { I18nPlugin, HelpersPlugin } from '@niuxe/template-engine/plugins'
 
 const engine = new TemplateEngine()
   .use(I18nPlugin)
