@@ -16,11 +16,11 @@ Ultra-lightweight JavaScript template engine with automatic HTML escaping, intel
 ## Installation
 
 ```bash
-npm install template-engine
+npm install @niux3/template-engine
 ```
 
 ```javascript
-import { TemplateEngine } from 'template-engine'
+import { TemplateEngine } from '@niux3/template-engine'
 ```
 
 ## Quick Start
