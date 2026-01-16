@@ -478,19 +478,19 @@ Use **Strict Mode** to catch undefined variables and prevent typos from becoming
 | Component | Minified + Gzipped |
 |-----------|-------------------|
 | **Core Engine** | **950 bytes** |
-| + Partials Plugin | +120 bytes (640 total) |
-| + Helpers Plugin | +80 bytes (600 total) |
-| + Strict Mode Plugin | +100 bytes (620 total) |
-| + Async Plugin | +60 bytes (580 total) |
-| + I18n Plugin | +180 bytes (700 total) |
-| **All plugins combined** | **~1060 bytes** |
+| + Partials Plugin | +270 bytes |
+| + Helpers Plugin | +150 bytes |
+| + Strict Mode Plugin | +290 bytes |
+| + Async Plugin | +260 bytes |
+| + I18n Plugin | +230 bytes |
+| **All plugins combined** | **~2150 bytes** |
 
 ### Comparison with alternatives
 
 | Library | Size (gzipped) | Partials | Helpers | I18n | Async |
 |---------|---------------|----------|---------|------|-------|
 | **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ |
-| **TemplateEngine (full)** | 1060 bytes | ✅ | ✅ | ✅ | ✅ |
+| **TemplateEngine (full)** | 2150 bytes | ✅ | ✅ | ✅ | ✅ |
 | Mustache | 9 KB | ✅ | ❌ | ❌ | ❌ |
 | EJS | 7 KB | ✅ | ❌ | ❌ | ✅ |
 | Handlebars | 20 KB | ✅ | ✅ | ❌ | ❌ |
