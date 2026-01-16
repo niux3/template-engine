@@ -1,5 +1,5 @@
 {
-  "name": "@niux3/template-engine",
+  "name": "@niuxe/template-engine",
   "version": "1.0.0",
   "description": "Ultra-lightweight JavaScript template engine with automatic HTML escaping, intelligent caching, and optional plugins (~950 bytes gzipped)",
   "type": "module",
