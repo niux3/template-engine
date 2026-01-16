@@ -23,8 +23,11 @@ export default defineConfig({
                 exports: 'named'
             }
         },
-        // Minification avec esbuild (plus rapide, déjà inclus dans Vite)
-        minify: 'esbuild'
+        // Minification activée explicitement
+        minify: 'esbuild',
+        // S'assurer qu'on est en mode production
+        sourcemap: false,
+        emptyOutDir: true
     },
     test: {
         globals: true,

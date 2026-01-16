@@ -11,9 +11,9 @@ importers:
       '@vitest/ui':
         specifier: 4.0.17
         version: 4.0.17(vitest@4.0.17)
-      terser:
-        specifier: ^5.45.0
-        version: 5.45.0
+      esbuild:
+        specifier: ^0.27.2
+        version: 0.27.2
       vite:
         specifier: ^7.2.4
         version: 7.3.1(terser@5.45.0)
@@ -668,13 +668,16 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
       '@jridgewell/trace-mapping': 0.3.31
+    optional: true
 
-  '@jridgewell/resolve-uri@3.1.2': {}
+  '@jridgewell/resolve-uri@3.1.2':
+    optional: true
 
   '@jridgewell/source-map@0.3.11':
     dependencies:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
+    optional: true
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
@@ -682,6 +685,7 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+    optional: true
 
   '@polka/url@1.0.0-next.29': {}
 
@@ -821,15 +825,18 @@ snapshots:
       '@vitest/pretty-format': 4.0.17
       tinyrainbow: 3.0.3
 
-  acorn@8.15.0: {}
+  acorn@8.15.0:
+    optional: true
 
   assertion-error@2.0.1: {}
 
-  buffer-from@1.1.2: {}
+  buffer-from@1.1.2:
+    optional: true
 
   chai@6.2.2: {}
 
-  commander@2.20.3: {}
+  commander@2.20.3:
+    optional: true
 
   es-module-lexer@1.7.0: {}
 
@@ -946,8 +953,10 @@ snapshots:
     dependencies:
       buffer-from: 1.1.2
       source-map: 0.6.1
+    optional: true
 
-  source-map@0.6.1: {}
+  source-map@0.6.1:
+    optional: true
 
   stackback@0.0.2: {}
 
@@ -959,6 +968,7 @@ snapshots:
       acorn: 8.15.0
       commander: 2.20.3
       source-map-support: 0.5.21
+    optional: true
 
   tinybench@2.9.0: {}
 

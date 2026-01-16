@@ -1,7 +1,7 @@
 {
   "name": "@niux3/template-engine",
   "version": "1.0.0",
-  "description": "Ultra-lightweight JavaScript template engine with automatic HTML escaping, intelligent caching, and optional plugins (~520 bytes gzipped)",
+  "description": "Ultra-lightweight JavaScript template engine with automatic HTML escaping, intelligent caching, and optional plugins (~950 bytes gzipped)",
   "type": "module",
   "main": "./dist/template-engine.js",
   "module": "./dist/template-engine.js",
@@ -45,7 +45,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "build": "vite build",
+    "build": "vite build && node scripts/minify.js",
+    "build:vite": "vite build",
     "prepublishOnly": "npm run build && npm test",
     "dev": "vite",
     "preview": "vite preview"
@@ -78,7 +79,7 @@
   "homepage": "https://github.com/niux3/template-engine#readme",
   "devDependencies": {
     "@vitest/ui": "4.0.17",
-    "terser": "^5.45.0",
+    "esbuild": "^0.27.2",
     "vite": "^7.2.4",
     "vitest": "^4.0.17"
   }

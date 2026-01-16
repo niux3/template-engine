@@ -2,7 +2,7 @@
 
 Ultra-lightweight JavaScript template engine with automatic HTML escaping, intelligent caching, and optional plugins.
 
-**~520 bytes gzipped (core)** | Zero dependencies | ES6+ | Modular
+**~950 bytes gzipped (core)** | Zero dependencies | ES6+ | Modular
 
 ## Why?
 
@@ -11,7 +11,7 @@ Ultra-lightweight JavaScript template engine with automatic HTML escaping, intel
 - **Secure**: Auto-escapes HTML by default
 - **Simple**: Clean syntax, no build step required
 - **Modular**: Optional plugins for partials, helpers, strict mode, and async file rendering
-- **Pay for what you use**: Core is 520 bytes, add only the plugins you need
+- **Pay for what you use**: Core is 950 bytes, add only the plugins you need
 
 ## Installation
 
@@ -477,7 +477,7 @@ Use **Strict Mode** to catch undefined variables and prevent typos from becoming
 
 | Component | Minified + Gzipped |
 |-----------|-------------------|
-| **Core Engine** | **520 bytes** |
+| **Core Engine** | **950 bytes** |
 | + Partials Plugin | +120 bytes (640 total) |
 | + Helpers Plugin | +80 bytes (600 total) |
 | + Strict Mode Plugin | +100 bytes (620 total) |
@@ -489,7 +489,7 @@ Use **Strict Mode** to catch undefined variables and prevent typos from becoming
 
 | Library | Size (gzipped) | Partials | Helpers | I18n | Async |
 |---------|---------------|----------|---------|------|-------|
-| **TemplateEngine (core)** | 520 bytes | ❌ | ❌ | ❌ | ❌ |
+| **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ |
 | **TemplateEngine (full)** | 1060 bytes | ✅ | ✅ | ✅ | ✅ |
 | Mustache | 9 KB | ✅ | ❌ | ❌ | ❌ |
 | EJS | 7 KB | ✅ | ❌ | ❌ | ✅ |
