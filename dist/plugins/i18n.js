@@ -1,0 +1,1 @@
+const l=(a,e)=>{a.locale="en",a.translations={},e.extraParams||(e.extraParams=[]),e.extraParams.push("t"),e.extraArgs||(e.extraArgs=[]),e.extraArgs.push((s,t={})=>{let r=a.translations[a.locale]?.[s]||s;return Object.keys(t).forEach(n=>{r=r.replace(new RegExp(`\\{${n}\\}`,"g"),t[n])}),r})};export{l as I18nPlugin};

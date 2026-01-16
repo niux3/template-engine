@@ -1,0 +1,1 @@
+const a=(n,e)=>{const o=new Map;n.partial=(r,s)=>(o.set(r,s),n);const p=(r,s=0)=>{if(s>10)throw new Error("Partial nesting too deep (max 10 levels)");return r.replace(/\[\[>\s*(\w+)\s*\]\]/g,(i,t)=>{if(!o.has(t))throw new Error(`Partial "${t}" not found`);return p(o.get(t),s+1)})};e.preprocessors||(e.preprocessors=[]),e.preprocessors.push(r=>p(r))};export{a as PartialsPlugin};

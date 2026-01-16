@@ -1,0 +1,1 @@
+const t=(e,a)=>{e.renderFile=async(r,n={})=>{if(typeof require>"u")throw new Error("renderFile only available in Node.js");const o=await(await Promise.resolve().then(()=>l)).readFile(r,"utf8");return e.render(o,n)}},l=Object.freeze(Object.defineProperty({__proto__:null},Symbol.toStringTag,{value:"Module"}));export{t as AsyncPlugin};
