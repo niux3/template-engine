@@ -1,6 +1,6 @@
 {
   "name": "@niuxe/template-engine",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Ultra-lightweight JavaScript template engine with automatic HTML escaping, intelligent caching, and optional plugins (~950 bytes gzipped)",
   "type": "module",
   "main": "./dist/template-engine.js",
@@ -17,6 +17,14 @@
     "./plugins/partials": {
       "import": "./dist/plugins/partials.js",
       "default": "./dist/plugins/partials.js"
+    },
+    "./plugins/partials_dynamic": {
+      "import": "./dist/plugins/partials_dynamic.js",
+      "default": "./dist/plugins/partials_dynamic.js"
+    },
+    "./plugins/partials_params": {
+      "import": "./dist/plugins/partials_params.js",
+      "default": "./dist/plugins/partials_params.js"
     },
     "./plugins/helpers": {
       "import": "./dist/plugins/helpers.js",
