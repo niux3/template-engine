@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { TemplateEngine } from '../src/TemplateEngine.js'
 import { PartialsPlugin } from '../src/plugins/partials.js'
-import { DynamicPartialsPlugin } from '../src/plugins/partials/dynamic.js'
+import { DynamicPartialsPlugin } from '../src/plugins/partials_dynamic.js'
 
 describe('Dynamic Partials Decorator', () => {
     let engine
