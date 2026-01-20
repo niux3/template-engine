@@ -79,5 +79,3 @@ export function DynamicPartialsPlugin(engine, ctx) {
         )
     })
 }
-
-export default DynamicPartialsPlugin

@@ -66,5 +66,3 @@ export function ParamsPartialsPlugin(engine, ctx) {
         )
     })
 }
-
-export default ParamsPartialsPlugin
