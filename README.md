@@ -11,7 +11,7 @@
 
 ## Why?
 
-- **Tiny**: 40x smaller than Handlebars, 15x smaller than EJS
+- **Tiny**: 27x smaller than Handlebars, 7x smaller than EJS, 3.4x smaller than Mustache.js
 - **Fast**: Built-in compilation cache with LRU eviction
 - **Secure**: Auto-escapes HTML by default
 - **Simple**: Clean syntax, no build step required
@@ -86,7 +86,7 @@ Renders unescaped HTML (use with caution)
 
 TemplateEngine uses a modular plugin system. Import only what you need to keep your bundle small.
 
-### Partials Plugin (+120 bytes)
+### Partials Plugin (+200 bytes)
 
 Reusable template fragments.
 
@@ -108,7 +108,121 @@ const html = engine.render(`
 
 **Syntax:** `[[> partialName ]]`
 
-### Helpers Plugin (+80 bytes)
+### Dynamic Partials Plugin (+450 bytes)
+
+Select partials dynamically using variables - perfect for component libraries and conditional rendering.
+
+```javascript
+import { TemplateEngine } from '@niuxe/template-engine'
+import { PartialsPlugin } from '@niuxe/template-engine/plugins/partials'
+import { DynamicPartialsPlugin } from '@niuxe/template-engine/plugins/partials-dynamic'
+
+const engine = new TemplateEngine()
+  .use(PartialsPlugin)
+  .use(DynamicPartialsPlugin)
+
+// Register different layouts
+engine.partial('adminLayout', '<div class="admin">[[= content ]]</div>')
+engine.partial('userLayout', '<div class="user">[[= content ]]</div>')
+engine.partial('guestLayout', '<div class="guest">[[= content ]]</div>')
+
+// Choose layout dynamically based on user role
+const html = engine.render('[[> (layoutType) ]]', {
+  layoutType: 'adminLayout',  // Variable determines which partial to use
+  content: 'Dashboard content'
+})
+
+// Works great in loops for rendering different component types
+engine.partial('imageCard', '<div class="image">Image</div>')
+engine.partial('videoCard', '<div class="video">Video</div>')
+engine.partial('textCard', '<div class="text">Text</div>')
+
+const items = engine.render(`
+  [[ items.forEach(item => { ]]
+    [[> (item.type) ]]
+  [[ }) ]]
+`, {
+  items: [
+    { type: 'imageCard' },
+    { type: 'videoCard' },
+    { type: 'textCard' }
+  ]
+})
+```
+
+**Syntax:** `[[> (variableName) ]]`
+
+**Features:**
+- Supports dot notation: `[[> (user.preferences.theme) ]]`
+- Works in loops and conditionals
+- Graceful fallback for undefined variables (renders empty string)
+
+### Params Partials Plugin (+400 bytes)
+
+Pass named parameters to partials - create reusable components with custom props.
+
+```javascript
+import { TemplateEngine } from '@niuxe/template-engine'
+import { PartialsPlugin } from '@niuxe/template-engine/plugins/partials'
+import { ParamsPartialsPlugin } from '@niuxe/template-engine/plugins/partials-params'
+
+const engine = new TemplateEngine()
+  .use(PartialsPlugin)
+  .use(ParamsPartialsPlugin)
+
+// Create a reusable button component
+engine.partial('button', `
+  <button class="btn btn-[[= variant ]] btn-[[= size ]]" type="[[= type ]]">
+    [[= label ]]
+  </button>
+`)
+
+// Use it with different parameters
+const html = engine.render(`
+  [[> button variant="primary" size="large" type="submit" label="Save Changes" ]]
+  [[> button variant="secondary" size="small" type="button" label="Cancel" ]]
+`, {})
+
+// Create alert component
+engine.partial('alert', `
+  <div class="alert alert-[[= type ]]" role="alert">
+    [[= message ]]
+  </div>
+`)
+
+const alerts = engine.render(`
+  [[> alert type="success" message="Operation successful!" ]]
+  [[> alert type="warning" message="Please be careful" ]]
+  [[> alert type="error" message="Something went wrong" ]]
+`, {})
+```
+
+**Syntax:** `[[> partialName key1="value1" key2="value2" ]]`
+
+**Features:**
+- Automatic type conversion: `"true"` → `true`, `"42"` → `42`
+- Parameters override context data
+- Mix with global context variables
+- Perfect for component libraries
+
+**Combining Dynamic + Params:**
+
+```javascript
+const engine = new TemplateEngine()
+  .use(PartialsPlugin)
+  .use(DynamicPartialsPlugin)
+  .use(ParamsPartialsPlugin)
+
+// You can use both features together!
+engine.partial('card', '<div class="[[= theme ]]">[[= title ]]</div>')
+
+// Dynamic partial selection + parameters
+engine.render('[[> (cardType) theme="dark" title="Hello" ]]', {
+  cardType: 'card'
+})
+```
+
+### Helpers Plugin (+150 bytes)
 
 Custom functions for formatting and transforming data.
 
@@ -130,7 +244,7 @@ const html = engine.render(`
 
 **Built-in helpers object:** `helpers.functionName(args)`
 
-### Strict Mode Plugin (+100 bytes)
+### Strict Mode Plugin (+290 bytes)
 
 Throws errors when accessing undefined variables, helping catch typos and missing data.
 
@@ -151,7 +265,7 @@ engine.render('[[= userName ]]', { userName: 'John' })
 
 Perfect for catching refactoring errors and validating API responses.
 
-### I18n Plugin (+180 bytes)
+### I18n Plugin (+230 bytes)
 
 Multi-language support with variable interpolation.
 
@@ -190,7 +304,7 @@ const html = engine.render(`
 
 **Note:** For complex i18n needs (plurals, dates, currencies), consider using [i18next](https://www.i18next.com/) with the HelpersPlugin.
 
-### Async Plugin (+60 bytes)
+### Async Plugin (+260 bytes)
 
 Read and render templates from files (Node.js only).
 
@@ -215,10 +329,19 @@ Plugins can be chained together:
 
 ```javascript
 import { TemplateEngine } from '@niuxe/template-engine'
-import { PartialsPlugin, HelpersPlugin, StrictModePlugin, I18nPlugin } from '@niuxe/template-engine/plugins'
+import {
+  PartialsPlugin,
+  DynamicPartialsPlugin,
+  ParamsPartialsPlugin,
+  HelpersPlugin,
+  StrictModePlugin,
+  I18nPlugin
+} from '@niuxe/template-engine/plugins'
 
 const engine = new TemplateEngine()
   .use(PartialsPlugin)
+  .use(DynamicPartialsPlugin)
+  .use(ParamsPartialsPlugin)
   .use(HelpersPlugin)
   .use(StrictModePlugin)
   .use(I18nPlugin)
@@ -232,12 +355,12 @@ engine.translations = {
 }
 
 const html = engine.render(`
-  [[> badge ]]
+  [[> badge text="New" ]]
   <p>[[= t("welcome") ]] [[= helpers.upper(name) ]]</p>
-`, { text: 'New', name: 'alice' })
+`, { name: 'alice' })
 ```
 
-**Total size:** ~1060 bytes gzipped (all plugins combined)
+**Total size with all plugins:** ~2.2 kio gzipped
 
 ## Core API
 
@@ -282,72 +405,45 @@ Useful when:
 
 ## Advanced Examples
 
-### Multilingual Website with I18n
+### Component Library with Dynamic Partials
 
 ```javascript
 import { TemplateEngine } from '@niuxe/template-engine'
-import { I18nPlugin, HelpersPlugin } from '@niuxe/template-engine/plugins'
+import { PartialsPlugin, DynamicPartialsPlugin, ParamsPartialsPlugin } from '@niuxe/template-engine/plugins'
 
 const engine = new TemplateEngine()
-  .use(I18nPlugin)
-  .use(HelpersPlugin)
+  .use(PartialsPlugin)
+  .use(DynamicPartialsPlugin)
+  .use(ParamsPartialsPlugin)
 
-// Setup translations
-engine.translations = {
-  en: {
-    nav_home: 'Home',
-    nav_about: 'About',
-    nav_contact: 'Contact',
-    welcome: 'Welcome, {name}!',
-    user_joined: 'Member since {date}',
-    items_in_cart: 'You have {count} items in your cart'
-  },
-  fr: {
-    nav_home: 'Accueil',
-    nav_about: 'À propos',
-    nav_contact: 'Contact',
-    welcome: 'Bienvenue, {name} !',
-    user_joined: 'Membre depuis {date}',
-    items_in_cart: 'Vous avez {count} articles dans votre panier'
-  },
-  es: {
-    nav_home: 'Inicio',
-    nav_about: 'Acerca de',
-    nav_contact: 'Contacto',
-    welcome: '¡Bienvenido, {name}!',
-    user_joined: 'Miembro desde {date}',
-    items_in_cart: 'Tienes {count} artículos en tu carrito'
-  }
-}
+// Define components
+engine.partial('button', '<button class="btn-[[= variant ]]">[[= label ]]</button>')
+engine.partial('input', '<input type="[[= type ]]" placeholder="[[= placeholder ]]">')
+engine.partial('card', '<div class="card-[[= theme ]]">[[= content ]]</div>')
 
-// Helper for date formatting
-engine.helper('formatDate', d => new Date(d).toLocaleDateString())
-
-// Render in different languages
-const template = `
-  <nav>
-    <a href="/">[[= t("nav_home") ]]</a>
-    <a href="/about">[[= t("nav_about") ]]</a>
-    <a href="/contact">[[= t("nav_contact") ]]</a>
-  </nav>
-  <h1>[[= t("welcome", {name: user.name}) ]]</h1>
-  <p>[[= t("user_joined", {date: helpers.formatDate(user.joined)}) ]]</p>
-  <p>[[= t("items_in_cart", {count: cart.length}) ]]</p>
-`
-
-// English
-engine.locale = 'en'
-const htmlEn = engine.render(template, {
-  user: { name: 'Alice', joined: '2024-01-15' },
-  cart: [1, 2, 3]
+// Render different components dynamically
+const form = engine.render(`
+  [[ components.forEach(comp => { ]]
+    [[> (comp.type) variant="primary" label="Submit" ]]
+  [[ }) ]]
+`, {
+  components: [
+    { type: 'button' },
+    { type: 'input' }
+  ]
 })
+```
 
-// French
-engine.locale = 'fr'
-engine.clear()
-const htmlFr = engine.render(template, {
-  user: { name: 'Alice', joined: '2024-01-15' },
-  cart: [1, 2, 3]
+### Multi-state Component
+
+```javascript
+engine.partial('loading', '<div class="spinner">Loading...</div>')
+engine.partial('error', '<div class="error">[[= message ]]</div>')
+engine.partial('success', '<div class="success">[[= data ]]</div>')
+
+// Render based on application state
+const widget = engine.render('[[> (state) message="Error occurred" data="Success!" ]]', {
+  state: 'loading' // Can be 'loading', 'error', or 'success'
 })
 ```
 
@@ -392,59 +488,6 @@ const email = engine.render(`
 })
 ```
 
-### Dashboard with Conditionals and Helpers
-
-```javascript
-engine.helper('formatDate', date => new Date(date).toLocaleDateString())
-engine.helper('status', active => active ? '✅ Active' : '❌ Inactive')
-
-const dashboard = engine.render(`
-  <div class="dashboard">
-    <h1>Welcome, [[= user.name ]]!</h1>
-
-    [[ if (user.role === 'admin') { ]]
-      <div class="admin-panel">
-        <h2>Admin Controls</h2>
-        <button>Manage Users</button>
-      </div>
-    [[ } ]]
-
-    <div class="stats">
-      <p>Member since: [[= helpers.formatDate(user.joined) ]]</p>
-      <p>Status: [[= helpers.status(user.active) ]]</p>
-      <p>Projects: [[= user.projects.length ]]</p>
-    </div>
-
-    <div class="projects">
-      <h2>Your Projects</h2>
-      [[ if (user.projects.length === 0) { ]]
-        <p>No projects yet. Create one to get started!</p>
-      [[ } else { ]]
-        <ul>
-        [[ user.projects.forEach(project => { ]]
-          <li>
-            <strong>[[= project.name ]]</strong>
-            - [[= helpers.status(project.active) ]]
-          </li>
-        [[ }) ]]
-        </ul>
-      [[ } ]]
-    </div>
-  </div>
-`, {
-  user: {
-    name: 'Alice',
-    role: 'admin',
-    joined: '2024-01-15',
-    active: true,
-    projects: [
-      { name: 'Project Alpha', active: true },
-      { name: 'Project Beta', active: false }
-    ]
-  }
-})
-```
-
 ## Performance
 
 - **Compilation cache**: Templates are compiled once, cached for reuse
@@ -483,22 +526,30 @@ Use **Strict Mode** to catch undefined variables and prevent typos from becoming
 | Component | Minified + Gzipped |
 |-----------|-------------------|
 | **Core Engine** | **950 bytes** |
-| + Partials Plugin | +270 bytes |
+| + Partials Plugin | +200 bytes |
+| + Dynamic Partials Plugin | +450 bytes |
+| + Params Partials Plugin | +400 bytes |
 | + Helpers Plugin | +150 bytes |
 | + Strict Mode Plugin | +290 bytes |
 | + Async Plugin | +260 bytes |
 | + I18n Plugin | +230 bytes |
-| **All plugins combined** | **~2150 bytes** |
+| **All plugins combined** | **~2.9 kio** |
 
 ### Comparison with alternatives
 
-| Library | Size (gzipped) | Partials | Helpers | I18n | Async |
-|---------|---------------|----------|---------|------|-------|
-| **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ |
-| **TemplateEngine (full)** | 2150 bytes | ✅ | ✅ | ✅ | ✅ |
-| Mustache | 9 KB | ✅ | ❌ | ❌ | ❌ |
-| EJS | 7 KB | ✅ | ❌ | ❌ | ✅ |
-| Handlebars | 20 KB | ✅ | ✅ | ❌ | ❌ |
+| Library | Size (gzipped) | Partials | Dynamic Partials | Parameters Partials | Helpers | I18n | Async |
+|---------|---------------|----------|------------------|------------|---------|------|-------|
+| **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **TemplateEngine (full)** | 2.9 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Mustache.js | 3.2 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| EJS | 4.3 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Handlebars | 26 kio | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+
+**TemplateEngine is:**
+- **3.4× lighter** than Mustache.js (core: 950 bytes vs 3.2 kio)
+- **7× lighter** than EJS (core: 950 bytes vs 7 kio)
+- **27× lighter** than Handlebars (core: 950 bytes vs 26 kio)
+- **Same features as Handlebars for 9× less** (full: 2.9 kio vs 26 kio)
 
 ## Browser Support
 
@@ -518,6 +569,7 @@ Works in all modern browsers and Node.js 14+.
 - Fast rendering
 - Simple syntax
 - Plugin extensibility
+- Component-based development (with Dynamic + Params plugins)
 
 ❌ **What it doesn't do:**
 - No layout inheritance (use partials instead)
@@ -527,6 +579,7 @@ Works in all modern browsers and Node.js 14+.
 
 **When to use:**
 - SPAs where bundle size matters
+- Component libraries and design systems
 - Simple server-side rendering
 - Email templates
 - Web components
@@ -536,29 +589,43 @@ Works in all modern browsers and Node.js 14+.
 - Complex CMS with untrusted content
 - Need for advanced template inheritance
 
-## Migration from EJS
+## Migration from Handlebars
 
 ```javascript
-// EJS
-<%- include('header') %>
-<h1><%= title %></h1>
-<% if (show) { %>
-  <p>Visible</p>
-<% } %>
+// Handlebars
+{{> header}}
+<h1>{{title}}</h1>
+{{#each items}}
+  <li>{{name}}</li>
+{{/each}}
 
-// TemplateEngine
+// TemplateEngine (equivalent features, 14× smaller!)
 [[> header ]]
 <h1>[[= title ]]</h1>
-[[ if (show) { ]]
-  <p>Visible</p>
-[[ } ]]
+[[ items.forEach(item => { ]]
+  <li>[[= item.name ]]</li>
+[[ }) ]]
+
+// Handlebars dynamic partials
+{{> (whichPartial) }}
+
+// TemplateEngine (with DynamicPartialsPlugin)
+[[> (whichPartial) ]]
+
+// Handlebars with parameters
+{{> card title="Hello" theme="dark" }}
+
+// TemplateEngine (with ParamsPartialsPlugin)
+[[> card title="Hello" theme="dark" ]]
 ```
 
 Main differences:
-- `<% %>` → `[[ ]]`
-- `<%= %>` → `[[= ]]`
-- `<%- %>` → `[[-]]`
-- `<%- include('name') %>` → `[[> name ]]` (requires PartialsPlugin)
+- `{{}}` → `[[ ]]`
+- `{{var}}` → `[[= var ]]`
+- `{{{raw}}}` → `[[-raw ]]`
+- `{{> name}}` → `[[> name ]]` (requires PartialsPlugin)
+- `{{> (dynamic)}}` → `[[> (dynamic) ]]` (requires DynamicPartialsPlugin)
+- `{{#each}}` → `[[ forEach ]]` (native JavaScript)
 
 ## Contributing
 
@@ -572,7 +639,7 @@ MIT
 
 ## Acknowledgments
 
-Inspired by EJS, Underscore templates, and the pursuit of minimalism.
+Inspired by Handlebars, EJS, Underscore templates, and the pursuit of minimalism.
 
 ---
 

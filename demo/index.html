@@ -1,833 +1,611 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TemplateEngine - Interactive Demo</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      scroll-behavior: smooth;
-    }
-
-    :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --secondary: #8b5cf6;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --bg: #0f172a;
-      --bg-light: #1e293b;
-      --bg-lighter: #334155;
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --border: #475569;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      padding: 2rem 0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-    }
-
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 2rem;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .logo img {
-      width: 40px;
-      height: 40px;
-    }
-
-    .logo h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-
-    .logo .size-badge {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    nav ul {
-      display: flex;
-      gap: 1.5rem;
-      list-style: none;
-    }
-
-    nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      transition: background 0.2s;
-    }
-
-    nav a:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 3rem 2rem;
-    }
-
-    .section {
-      margin-bottom: 4rem;
-      scroll-margin-top: 170px;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .section-number {
-      background: var(--primary);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.25rem;
-    }
-
-    .section h2 {
-      font-size: 2rem;
-      color: var(--text);
-    }
-
-    .demo-container {
-      background: var(--bg-light);
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .demo-controls {
-      background: var(--bg-lighter);
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .demo-output {
-      padding: 2rem;
-      min-height: 200px;
-    }
-
-    .code-block {
-      background: #1e1e1e;
-      padding: 1.5rem;
-      border-radius: 8px;
-      overflow-x: auto;
-      margin: 1rem 0;
-      border: 1px solid var(--border);
-    }
-
-    .code-block pre {
-      margin: 0;
-      color: #d4d4d4;
-      font-family: 'Monaco', 'Courier New', monospace;
-      font-size: 0.875rem;
-    }
-
-    .btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn:hover {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-    }
-
-    .input-group {
-      margin-bottom: 1rem;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .input-group input,
-    .input-group select,
-    .input-group textarea {
-      width: 100%;
-      padding: 0.75rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-family: inherit;
-    }
-
-    .input-group textarea {
-      resize: vertical;
-      min-height: 100px;
-      font-family: 'Monaco', 'Courier New', monospace;
-    }
-
-    .card {
-      background: var(--bg-lighter);
-      padding: 1.5rem;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      margin-bottom: 1rem;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-
-    .badge-success { background: var(--success); color: white; }
-    .badge-warning { background: var(--warning); color: white; }
-    .badge-danger { background: var(--danger); color: white; }
-
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .product-card {
-      background: var(--bg-lighter);
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      transition: transform 0.2s;
-    }
-
-    .product-card:hover {
-      transform: translateY(-4px);
-    }
-
-    .product-image {
-      width: 100%;
-      height: 150px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-    }
-
-    .product-info {
-      padding: 1rem;
-    }
-
-    .product-title {
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .product-price {
-      color: var(--success);
-      font-size: 1.25rem;
-      font-weight: 700;
-    }
-
-    .lang-switcher {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .lang-btn {
-      padding: 0.5rem 1rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .lang-btn.active {
-      background: var(--primary);
-      border-color: var(--primary);
-    }
-
-    .error-message {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid var(--danger);
-      color: var(--danger);
-      padding: 1rem;
-      border-radius: 6px;
-      margin-top: 1rem;
-    }
-
-    @media (max-width: 768px) {
-      .header-content {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      nav ul {
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-
-      .product-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="header-content">
-      <div class="logo">
-        <img src="./static/gears.svg" alt="TemplateEngine">
-        <div>
-          <h1>TemplateEngine</h1>
-          <span class="size-badge">~950 bytes gzipped</span>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TemplateEngine - Interactive Demo</title>
+    <link rel="stylesheet" href="./static/styles.css">
+  </head>
+  <body>
+    <header>
+      <div class="header-content">
+        <div class="logo">
+          <img src="./static/gears.svg" alt="TemplateEngine">
+          <div>
+            <h1>TemplateEngine</h1>
+            <span class="size-badge">~950 bytes gzipped</span>
+          </div>
         </div>
+        <nav>
+          <ul>
+            <li><a href="#basic">Basic</a></li>
+            <li><a href="#partials">Partials</a></li>
+            <li><a href="#dynamic">Dynamic</a></li>
+            <li><a href="#params">Params</a></li>
+            <li><a href="#helpers">Helpers</a></li>
+            <li><a href="#i18n">i18n</a></li>
+            <li><a href="#strict">Strict</a></li>
+          </ul>
+        </nav>
       </div>
-      <nav>
-        <ul>
-          <li><a href="#basic">Basic</a></li>
-          <li><a href="#partials">Partials</a></li>
-          <li><a href="#helpers">Helpers</a></li>
-          <li><a href="#i18n">i18n</a></li>
-          <li><a href="#strict">Strict Mode</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+    </header>
 
-  <main>
-    <!-- Section 1: Basic Usage -->
-    <section id="basic" class="section">
-      <div class="section-header">
-        <span class="section-number">1</span>
-        <h2>Basic Usage</h2>
-      </div>
+    <main>
+      <!-- Section 1: Basic Usage -->
+      <section id="basic" class="section">
+        <div class="section-header">
+          <span class="section-number">1</span>
+          <h2>Basic Usage</h2>
+        </div>
 
-      <div class="code-block">
-        <pre>
+        <div class="code-block">
+          <pre>
 const basicEngine = new TemplateEngine()
 
 const renderBasic = function() {
-    const template = document.getElementById('basic-template').value
-    const output = document.getElementById('basic-output')
+  const template = document.getElementById('basic-template').value
+  const output = document.getElementById('basic-output')
 
-    const data = {
-        title: 'Dashboard',
-        user: {
-            name: 'Alice Johnson',
-            role: 'Developer'
-        },
-        notifications: 5
-    }
+  const data = {
+    title: 'Dashboard',
+    user: {
+      name: 'Alice Johnson',
+      role: 'Developer'
+    },
+    notifications: 5
+  }
 
-    try {
-        const html = basicEngine.render(template, data)
-        output.innerHTML = html
-    } catch (error) {
-        output.innerHTML = `&lt;div class="error-message"&gt;Error: ${error.message}&lt;/div&gt;`
-    }
+  try {
+    const html = basicEngine.render(template, data)
+    output.innerHTML = html
+  } catch (error) {
+    output.innerHTML = `&lt;div class="error-message"&gt;Error: ${error.message}&lt;/div&gt;`
+  }
 }
 
 // Auto-render on load
 renderBasic()
-</pre>
-      </div>
-
-      <div class="demo-container">
-        <div class="demo-controls">
-          <div class="input-group">
-            <label>Template:</label>
-            <textarea id="basic-template">&lt;h3&gt;[[= title ]]&lt;/h3&gt;
-&lt;p&gt;Welcome [[= user.name ]]! You have [[= notifications ]] new notifications.&lt;/p&gt;</textarea>
-          </div>
+          </pre>
         </div>
-        <div class="demo-output" id="basic-output"></div>
-      </div>
-    </section>
 
-    <!-- Section 2: Partials -->
-    <section id="partials" class="section">
-      <div class="section-header">
-        <span class="section-number">2</span>
-        <h2>Partials Plugin</h2>
-      </div>
+        <div class="demo-container">
+          <div class="demo-controls">
+            <div class="input-group">
+              <label>Template:</label>
+              <textarea id="basic-template">&lt;h3&gt;[[= title ]]&lt;/h3&gt;
+                &lt;p&gt;Welcome [[= user.name ]]! You have [[= notifications ]] new notifications.&lt;/p&gt;</textarea>
+            </div>
+          </div>
+          <div class="demo-output" id="basic-output"></div>
+        </div>
+      </section>
 
-      <div class="code-block">
-        <pre>
+      <!-- Section 2: Partials -->
+      <section id="partials" class="section">
+        <div class="section-header">
+          <span class="section-number">2</span>
+          <h2>Partials Plugin</h2>
+        </div>
+
+        <div class="code-block">
+          <pre>
 const partialsEngine = new TemplateEngine().use(PartialsPlugin)
 
 // Define partials
 partialsEngine.partial('usercard', `
-  &lt;div class="card"&gt;
-    &lt;h3&gt;[[= member.name ]]&lt;/h3&gt;
-    &lt;p&gt;&lt;strong&gt;Role:&lt;/strong&gt; &lt;span class="badge badge-success"&gt;[[= member.role ]]&lt;/span&gt;&lt;/p&gt;
-    &lt;p&gt;&lt;strong&gt;Email:&lt;/strong&gt; [[= member.email ]]&lt;/p&gt;
-    &lt;p&gt;&lt;strong&gt;Joined:&lt;/strong&gt; [[= member.joined ]]&lt;/p&gt;
-  &lt;/div&gt;
+&lt;div class="card"&gt;
+&lt;h3&gt;[[= member.name ]]&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Role:&lt;/strong&gt; &lt;span class="badge badge-success"&gt;[[= member.role ]]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Email:&lt;/strong&gt; [[= member.email ]]&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Joined:&lt;/strong&gt; [[= member.joined ]]&lt;/p&gt;
+&lt;/div&gt;
 `)
 
 partialsEngine.partial('statcard', `
-  &lt;div class="card"&gt;
-    &lt;div style="font-size: 2rem; font-weight: 700; color: var(--primary);"&gt;[[= stat.value ]]&lt;/div&gt;
-    &lt;div style="color: var(--text-muted); margin-top: 0.5rem;"&gt;[[= stat.label ]]&lt;/div&gt;
-  &lt;/div&gt;
+&lt;div class="card"&gt;
+&lt;div style="font-size: 2rem; font-weight: 700; color: var(--primary);"&gt;[[= stat.value ]]&lt;/div&gt;
+&lt;div style="color: var(--text-muted); margin-top: 0.5rem;"&gt;[[= stat.label ]]&lt;/div&gt;
+&lt;/div&gt;
 `)
 
 const renderPartials = function() {
-    const partialsTemplate = `
-    &lt;h3&gt;Team Members&lt;/h3&gt;
-    &lt;div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 2rem;"&gt;
-      [[ team.forEach(member =&gt; { ]]
-        [[&gt; usercard ]]
-      [[ }) ]]
-    &lt;/div&gt;
+  const partialsTemplate = `
+&lt;h3&gt;Team Members&lt;/h3&gt;
+&lt;div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 2rem;"&gt;
+[[ team.forEach(member =&gt; { ]]
+[[&gt; usercard ]]
+[[ }) ]]
+&lt;/div&gt;
 
-    &lt;h3&gt;Statistics&lt;/h3&gt;
-    &lt;div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"&gt;
-      [[ stats.forEach(stat =&gt; { ]]
-        [[&gt; statcard ]]
-      [[ }) ]]
-    &lt;/div&gt;
-  `
+&lt;h3&gt;Statistics&lt;/h3&gt;
+&lt;div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"&gt;
+[[ stats.forEach(stat =&gt; { ]]
+[[&gt; statcard ]]
+[[ }) ]]
+&lt;/div&gt;
+`
 
-    const partialsData = {
-        team: [
-            { name: 'Alice Johnson', role: 'Frontend Dev', email: 'alice@example.com', joined: '2023-01-15' },
-            { name: 'Bob Smith', role: 'Backend Dev', email: 'bob@example.com', joined: '2023-03-22' },
-            { name: 'Carol Williams', role: 'UI/UX Designer', email: 'carol@example.com', joined: '2023-06-10' }
-        ],
-        stats: [
-            { value: '1,234', label: 'Active Users' },
-            { value: '56', label: 'Projects' },
-            { value: '89%', label: 'Uptime' },
-            { value: '$12.5K', label: 'Revenue' }
-        ]
-    }
+  const partialsData = {
+    team: [
+      { name: 'Alice Johnson', role: 'Frontend Dev', email: 'alice@example.com', joined: '2023-01-15' },
+      { name: 'Bob Smith', role: 'Backend Dev', email: 'bob@example.com', joined: '2023-03-22' },
+      { name: 'Carol Williams', role: 'UI/UX Designer', email: 'carol@example.com', joined: '2023-06-10' }
+    ],
+    stats: [
+      { value: '1,234', label: 'Active Users' },
+      { value: '56', label: 'Projects' },
+      { value: '89%', label: 'Uptime' },
+      { value: '$12.5K', label: 'Revenue' }
+    ]
+  }
 
-    document.getElementById('partials-output').innerHTML = partialsEngine.render(partialsTemplate, partialsData)
+  document.getElementById('partials-output').innerHTML = partialsEngine.render(partialsTemplate, partialsData)
 }
 
 // Auto-render on load
 renderPartials()
-</pre>
-      </div>
+          </pre>
+        </div>
 
-      <div class="demo-container">
-        <div class="demo-output" id="partials-output"></div>
-      </div>
-    </section>
+        <div class="demo-container">
+          <div class="demo-output" id="partials-output"></div>
+        </div>
+      </section>
 
-    <!-- Section 3: Helpers -->
-    <section id="helpers" class="section">
-      <div class="section-header">
-        <span class="section-number">3</span>
-        <h2>Helpers Plugin</h2>
-      </div>
+      <!-- Section 2.1: Dynamic Partials -->
+      <section id="dynamic" class="section">
+        <div class="section-header">
+          <span class="section-number">2.1</span>
+          <h2>Dynamic Partials Plugin</h2>
+        </div>
 
-      <div class="code-block">
-        <pre>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">
+          Select partials dynamically using variables - perfect for state management and component libraries.
+        </p>
+
+        <div class="code-block">
+          <pre>
+const dynamicEngine = new TemplateEngine().use(PartialsPlugin).use(DynamicPartialsPlugin)
+
+// Define different states
+dynamicEngine.partial('loadingCard', `&lt;div&gt;Loading...&lt;/div&gt;`)
+dynamicEngine.partial('errorCard', `&lt;div&gt;Error: [[= message ]]&lt;/div&gt;`)
+dynamicEngine.partial('successCard', `&lt;div&gt;Success!&lt;/div&gt;`)
+
+// Use dynamic partial selection
+const template = `[[&gt; (cardType) ]]`
+
+// Render different states
+engine.render(template, { cardType: 'loadingCard' })  // Shows loading
+engine.render(template, { cardType: 'errorCard', message: 'Failed!' })  // Shows error
+engine.render(template, { cardType: 'successCard' })  // Shows success
+          </pre>
+        </div>
+
+        <div class="demo-container">
+          <div class="demo-controls">
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-weight: 500;">
+                Switch State:
+              </label>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="state-btn active" onclick="changeState('loading')">⏳ Loading</button>
+                <button class="state-btn" onclick="changeState('error')">❌ Error</button>
+                <button class="state-btn" onclick="changeState('success')">✅ Success</button>
+                <button class="state-btn" onclick="changeState('data')">📊 Data</button>
+              </div>
+            </div>
+          </div>
+          <div class="demo-output" id="dynamic-output"></div>
+        </div>
+      </section>
+
+      <!-- Section 2.2: Params Partials -->
+      <section id="params" class="section">
+        <div class="section-header">
+          <span class="section-number">2.2</span>
+          <h2>Params Partials Plugin</h2>
+        </div>
+
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">
+          Pass named parameters to partials - create reusable components with custom props.
+        </p>
+
+        <div class="code-block">
+          <pre>
+const paramsEngine = new TemplateEngine().use(PartialsPlugin).use(ParamsPartialsPlugin)
+
+// Define a reusable button component
+paramsEngine.partial('button', `
+&lt;button class="btn btn-[[= variant ]] btn-[[= size ]]"&gt;
+[[= label ]]
+&lt;/button&gt;
+`)
+
+// Use with different parameters
+const html = paramsEngine.render(`
+[[&gt; button variant="primary" size="large" label="Save Changes" ]]
+[[&gt; button variant="secondary" size="small" label="Cancel" ]]
+[[&gt; button variant="danger" size="medium" label="Delete" ]]
+`, {})
+
+// Parameters override context data
+paramsEngine.render(
+  `[[&gt; button variant="primary" size="large" label="Custom" ]]`,
+  { variant: 'secondary' }  // Parameter wins over context
+)
+          </pre>
+        </div>
+
+        <div class="demo-container">
+          <div class="demo-output" id="params-output"></div>
+        </div>
+      </section>
+
+
+
+      <!-- Section 3: Helpers -->
+      <section id="helpers" class="section">
+        <div class="section-header">
+          <span class="section-number">3</span>
+          <h2>Helpers Plugin</h2>
+        </div>
+
+        <div class="code-block">
+          <pre>
 const helpersEngine = new TemplateEngine().use(HelpersPlugin)
 
 // Define helpers
 helpersEngine.helper('currency', (price) =&gt; {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(price)
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(price)
 })
 
 helpersEngine.helper('formatDate', (dateStr) =&gt; {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    })
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
 })
 
 helpersEngine.helper('truncate', (text, length = 50) =&gt; {
-    if (text.length &lt;= length) return text
-    return text.substring(0, length) + '...'
+  if (text.length &lt;= length) return text
+  return text.substring(0, length) + '...'
 })
 
 helpersEngine.helper('statusBadge', (status) =&gt; {
-    const badges = {
-        active: '&lt;span class="badge badge-success"&gt;Active&lt;/span&gt;',
-        pending: '&lt;span class="badge badge-warning"&gt;Pending&lt;/span&gt;',
-        inactive: '&lt;span class="badge badge-danger"&gt;Inactive&lt;/span&gt;'
-    }
-    return badges[status] || status
+  const badges = {
+    active: '&lt;span class="badge badge-success"&gt;Active&lt;/span&gt;',
+    pending: '&lt;span class="badge badge-warning"&gt;Pending&lt;/span&gt;',
+    inactive: '&lt;span class="badge badge-danger"&gt;Inactive&lt;/span&gt;'
+  }
+  return badges[status] || status
 })
 
 const renderHelpers = function() {
-    // Product catalog demo
-    const helpersTemplate = `
-    &lt;h3&gt;Product Catalog&lt;/h3&gt;
-    &lt;div class="product-grid"&gt;
-      [[ products.forEach(product =&gt; { ]]
-        &lt;div class="product-card"&gt;
-          &lt;div class="product-image"&gt;[[= product.emoji ]]&lt;/div&gt;
-          &lt;div class="product-info"&gt;
-            &lt;div class="product-title"&gt;[[= product.name ]]&lt;/div&gt;
-            &lt;p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.5rem 0;"&gt;
-              [[= helpers.truncate(product.description, 60) ]]
-            &lt;/p&gt;
-            &lt;div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;"&gt;
-              &lt;div class="product-price"&gt;[[= helpers.currency(product.price) ]]&lt;/div&gt;
-              [[-helpers.statusBadge(product.status) ]]
-            &lt;/div&gt;
-            &lt;div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;"&gt;
-              Added: [[= helpers.formatDate(product.addedDate) ]]
-            &lt;/div&gt;
-          &lt;/div&gt;
-        &lt;/div&gt;
-      [[ }) ]]
-    &lt;/div&gt;
-  `
+  // Product catalog demo
+  const helpersTemplate = `
+&lt;h3&gt;Product Catalog&lt;/h3&gt;
+&lt;div class="product-grid"&gt;
+[[ products.forEach(product =&gt; { ]]
+&lt;div class="product-card"&gt;
+&lt;div class="product-image"&gt;[[= product.emoji ]]&lt;/div&gt;
+&lt;div class="product-info"&gt;
+&lt;div class="product-title"&gt;[[= product.name ]]&lt;/div&gt;
+&lt;p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.5rem 0;"&gt;
+[[= helpers.truncate(product.description, 60) ]]
+&lt;/p&gt;
+&lt;div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;"&gt;
+&lt;div class="product-price"&gt;[[= helpers.currency(product.price) ]]&lt;/div&gt;
+[[-helpers.statusBadge(product.status) ]]
+&lt;/div&gt;
+&lt;div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;"&gt;
+Added: [[= helpers.formatDate(product.addedDate) ]]
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+[[ }) ]]
+&lt;/div&gt;
+`
 
-    const helpersData = {
-        products: [
-            {
-                name: 'Laptop Pro',
-                emoji: '💻',
-                description: 'High-performance laptop with stunning display and amazing battery life',
-                price: 1299.99,
-                status: 'active',
-                addedDate: '2024-11-15'
-            },
-            {
-                name: 'Wireless Mouse',
-                emoji: '🖱️',
-                description: 'Ergonomic wireless mouse with precision tracking',
-                price: 49.99,
-                status: 'active',
-                addedDate: '2024-12-01'
-            },
-            {
-                name: 'Mechanical Keyboard',
-                emoji: '⌨️',
-                description: 'Premium mechanical keyboard with RGB lighting and customizable keys',
-                price: 159.99,
-                status: 'pending',
-                addedDate: '2025-01-05'
-            },
-            {
-                name: 'USB-C Hub',
-                emoji: '🔌',
-                description: 'Multi-port USB-C hub for all your connectivity needs',
-                price: 79.99,
-                status: 'inactive',
-                addedDate: '2024-10-20'
-            },
-            {
-                name: 'Webcam HD',
-                emoji: '📹',
-                description: 'Crystal clear 4K webcam perfect for video calls and streaming',
-                price: 129.99,
-                status: 'active',
-                addedDate: '2024-12-15'
-            },
-            {
-                name: 'Headphones',
-                emoji: '🎧',
-                description: 'Noise-cancelling headphones with superior sound quality',
-                price: 249.99,
-                status: 'active',
-                addedDate: '2024-11-30'
-            }
-        ]
-    }
+  const helpersData = {
+    products: [
+      {
+        name: 'Laptop Pro',
+        emoji: '💻',
+        description: 'High-performance laptop with stunning display and amazing battery life',
+        price: 1299.99,
+        status: 'active',
+        addedDate: '2024-11-15'
+      },
+      {
+        name: 'Wireless Mouse',
+        emoji: '🖱️',
+        description: 'Ergonomic wireless mouse with precision tracking',
+        price: 49.99,
+        status: 'active',
+        addedDate: '2024-12-01'
+      },
+      {
+        name: 'Mechanical Keyboard',
+        emoji: '⌨️',
+        description: 'Premium mechanical keyboard with RGB lighting and customizable keys',
+        price: 159.99,
+        status: 'pending',
+        addedDate: '2025-01-05'
+      },
+      {
+        name: 'USB-C Hub',
+        emoji: '🔌',
+        description: 'Multi-port USB-C hub for all your connectivity needs',
+        price: 79.99,
+        status: 'inactive',
+        addedDate: '2024-10-20'
+      },
+      {
+        name: 'Webcam HD',
+        emoji: '📹',
+        description: 'Crystal clear 4K webcam perfect for video calls and streaming',
+        price: 129.99,
+        status: 'active',
+        addedDate: '2024-12-15'
+      },
+      {
+        name: 'Headphones',
+        emoji: '🎧',
+        description: 'Noise-cancelling headphones with superior sound quality',
+        price: 249.99,
+        status: 'active',
+        addedDate: '2024-11-30'
+      }
+    ]
+  }
 
-    document.getElementById('helpers-output').innerHTML = helpersEngine.render(helpersTemplate, helpersData)
+  document.getElementById('helpers-output').innerHTML = helpersEngine.render(helpersTemplate, helpersData)
 }
 
 // Auto-render on load
 renderHelpers()
           </pre>
-      </div>
+        </div>
 
-      <div class="demo-container">
-        <div class="demo-output" id="helpers-output"></div>
-      </div>
-    </section>
+        <div class="demo-container">
+          <div class="demo-output" id="helpers-output"></div>
+        </div>
+      </section>
 
-    <!-- Section 4: i18n -->
-    <section id="i18n" class="section">
-      <div class="section-header">
-        <span class="section-number">4</span>
-        <h2>i18n Plugin</h2>
-      </div>
+      <!-- Section 4: i18n -->
+      <section id="i18n" class="section">
+        <div class="section-header">
+          <span class="section-number">4</span>
+          <h2>i18n Plugin</h2>
+        </div>
 
-      <div class="code-block">
-        <pre>
+        <div class="code-block">
+          <pre>
 const i18nEngine = new TemplateEngine().use(I18nPlugin).use(HelpersPlugin)
 
 // Setup translations
 i18nEngine.translations = {
-    en: {
-        welcome: 'Welcome back, {name}!',
-        dashboard: 'Dashboard',
-        stats_title: 'Your Statistics',
-        total_sales: 'Total Sales',
-        active_projects: 'Active Projects',
-        team_members: 'Team Members',
-        notifications: 'Notifications',
-        recent_activity: 'Recent Activity',
-        completed_task: '{user} completed task "{task}"',
-        joined_team: '{user} joined the team',
-        new_message: 'New message from {user}',
-        view_all: 'View All'
-    },
-    fr: {
-        welcome: 'Bienvenue, {name} !',
-        dashboard: 'Tableau de bord',
-        stats_title: 'Vos statistiques',
-        total_sales: 'Ventes totales',
-        active_projects: 'Projets actifs',
-        team_members: 'Membres de l\'équipe',
-        notifications: 'Notifications',
-        recent_activity: 'Activité récente',
-        completed_task: '{user} a terminé la tâche "{task}"',
-        joined_team: '{user} a rejoint l\'équipe',
-        new_message: 'Nouveau message de {user}',
-        view_all: 'Voir tout'
-    },
-    es: {
-        welcome: '¡Bienvenido, {name}!',
-        dashboard: 'Panel de control',
-        stats_title: 'Tus estadísticas',
-        total_sales: 'Ventas totales',
-        active_projects: 'Proyectos activos',
-        team_members: 'Miembros del equipo',
-        notifications: 'Notificaciones',
-        recent_activity: 'Actividad reciente',
-        completed_task: '{user} completó la tarea "{task}"',
-        joined_team: '{user} se unió al equipo',
-        new_message: 'Nuevo mensaje de {user}',
-        view_all: 'Ver todo'
-    }
+  en: {
+    welcome: 'Welcome back, {name}!',
+    dashboard: 'Dashboard',
+    stats_title: 'Your Statistics',
+    total_sales: 'Total Sales',
+    active_projects: 'Active Projects',
+    team_members: 'Team Members',
+    notifications: 'Notifications',
+    recent_activity: 'Recent Activity',
+    completed_task: '{user} completed task "{task}"',
+    joined_team: '{user} joined the team',
+    new_message: 'New message from {user}',
+    view_all: 'View All'
+  },
+  fr: {
+    welcome: 'Bienvenue, {name} !',
+    dashboard: 'Tableau de bord',
+    stats_title: 'Vos statistiques',
+    total_sales: 'Ventes totales',
+    active_projects: 'Projets actifs',
+    team_members: 'Membres de l\'équipe',
+    notifications: 'Notifications',
+    recent_activity: 'Activité récente',
+    completed_task: '{user} a terminé la tâche "{task}"',
+    joined_team: '{user} a rejoint l\'équipe',
+    new_message: 'Nouveau message de {user}',
+    view_all: 'Voir tout'
+  },
+  es: {
+    welcome: '¡Bienvenido, {name}!',
+    dashboard: 'Panel de control',
+    stats_title: 'Tus estadísticas',
+    total_sales: 'Ventas totales',
+    active_projects: 'Proyectos activos',
+    team_members: 'Miembros del equipo',
+    notifications: 'Notificaciones',
+    recent_activity: 'Actividad reciente',
+    completed_task: '{user} completó la tarea "{task}"',
+    joined_team: '{user} se unió al equipo',
+    new_message: 'Nuevo mensaje de {user}',
+    view_all: 'Ver todo'
+  }
 }
 
 i18nEngine.helper('currency', (price) =&gt; {
-    const formats = {
-        en: { style: 'currency', currency: 'USD' },
-        fr: { style: 'currency', currency: 'EUR' },
-        es: { style: 'currency', currency: 'EUR' }
-    }
-    const locale = i18nEngine.locale || 'en'
-    return new Intl.NumberFormat(locale, formats[locale]).format(price)
+  const formats = {
+    en: { style: 'currency', currency: 'USD' },
+    fr: { style: 'currency', currency: 'EUR' },
+    es: { style: 'currency', currency: 'EUR' }
+  }
+  const locale = i18nEngine.locale || 'en'
+  return new Intl.NumberFormat(locale, formats[locale]).format(price)
 })
 
 const i18nTemplate = `
-  &lt;div style="background: var(--bg-lighter); padding: 2rem; border-radius: 8px;"&gt;
-    &lt;h2&gt;[[= t("welcome", {name: user.name}) ]]&lt;/h2&gt;
-    &lt;p style="color: var(--text-muted); margin-bottom: 2rem;"&gt;[[= t("dashboard") ]]&lt;/p&gt;
+&lt;div style="background: var(--bg-lighter); padding: 2rem; border-radius: 8px;"&gt;
+&lt;h2&gt;[[= t("welcome", {name: user.name}) ]]&lt;/h2&gt;
+&lt;p style="color: var(--text-muted); margin-bottom: 2rem;"&gt;[[= t("dashboard") ]]&lt;/p&gt;
 
-    &lt;h3&gt;[[= t("stats_title") ]]&lt;/h3&gt;
-    &lt;div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;"&gt;
-      &lt;div class="card"&gt;
-        &lt;div style="font-size: 2rem; font-weight: 700; color: var(--success);"&gt;[[= helpers.currency(stats.sales) ]]&lt;/div&gt;
-        &lt;div style="color: var(--text-muted);"&gt;[[= t("total_sales") ]]&lt;/div&gt;
-      &lt;/div&gt;
-      &lt;div class="card"&gt;
-        &lt;div style="font-size: 2rem; font-weight: 700; color: var(--primary);"&gt;[[= stats.projects ]]&lt;/div&gt;
-        &lt;div style="color: var(--text-muted);"&gt;[[= t("active_projects") ]]&lt;/div&gt;
-      &lt;/div&gt;
-      &lt;div class="card"&gt;
-        &lt;div style="font-size: 2rem; font-weight: 700; color: var(--secondary);"&gt;[[= stats.teamSize ]]&lt;/div&gt;
-        &lt;div style="color: var(--text-muted);"&gt;[[= t("team_members") ]]&lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
+&lt;h3&gt;[[= t("stats_title") ]]&lt;/h3&gt;
+&lt;div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;"&gt;
+&lt;div class="card"&gt;
+&lt;div style="font-size: 2rem; font-weight: 700; color: var(--success);"&gt;[[= helpers.currency(stats.sales) ]]&lt;/div&gt;
+&lt;div style="color: var(--text-muted);"&gt;[[= t("total_sales") ]]&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="card"&gt;
+&lt;div style="font-size: 2rem; font-weight: 700; color: var(--primary);"&gt;[[= stats.projects ]]&lt;/div&gt;
+&lt;div style="color: var(--text-muted);"&gt;[[= t("active_projects") ]]&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="card"&gt;
+&lt;div style="font-size: 2rem; font-weight: 700; color: var(--secondary);"&gt;[[= stats.teamSize ]]&lt;/div&gt;
+&lt;div style="color: var(--text-muted);"&gt;[[= t("team_members") ]]&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 
-    &lt;h3&gt;[[= t("recent_activity") ]]&lt;/h3&gt;
-    &lt;div style="background: var(--bg); padding: 1.5rem; border-radius: 8px;"&gt;
-      [[ activities.forEach(activity =&gt; { ]]
-        &lt;div style="padding: 1rem 0; border-bottom: 1px solid var(--border);"&gt;
-          [[ if (activity.type === 'task') { ]]
-            &lt;p&gt;[[= t("completed_task", {user: activity.user, task: activity.task}) ]]&lt;/p&gt;
-          [[ } else if (activity.type === 'join') { ]]
-            &lt;p&gt;[[= t("joined_team", {user: activity.user}) ]]&lt;/p&gt;
-          [[ } else if (activity.type === 'message') { ]]
-            &lt;p&gt;[[= t("new_message", {user: activity.user}) ]]&lt;/p&gt;
-          [[ } ]]
-          &lt;small style="color: var(--text-muted);"&gt;[[= activity.time ]]&lt;/small&gt;
-        &lt;/div&gt;
-      [[ }) ]]
-      &lt;button class="btn" style="margin-top: 1rem;"&gt;[[= t("view_all") ]]&lt;/button&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
+&lt;h3&gt;[[= t("recent_activity") ]]&lt;/h3&gt;
+&lt;div style="background: var(--bg); padding: 1.5rem; border-radius: 8px;"&gt;
+[[ activities.forEach(activity =&gt; { ]]
+&lt;div style="padding: 1rem 0; border-bottom: 1px solid var(--border);"&gt;
+[[ if (activity.type === 'task') { ]]
+&lt;p&gt;[[= t("completed_task", {user: activity.user, task: activity.task}) ]]&lt;/p&gt;
+[[ } else if (activity.type === 'join') { ]]
+&lt;p&gt;[[= t("joined_team", {user: activity.user}) ]]&lt;/p&gt;
+[[ } else if (activity.type === 'message') { ]]
+&lt;p&gt;[[= t("new_message", {user: activity.user}) ]]&lt;/p&gt;
+[[ } ]]
+&lt;small style="color: var(--text-muted);"&gt;[[= activity.time ]]&lt;/small&gt;
+&lt;/div&gt;
+[[ }) ]]
+&lt;button class="btn" style="margin-top: 1rem;"&gt;[[= t("view_all") ]]&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 `
 
 const i18nData = {
-    user: { name: 'Alex' },
-    stats: {
-        sales: 45230.50,
-        projects: 12,
-        teamSize: 8
-    },
-    activities: [
-        { type: 'task', user: 'Sarah', task: 'Update homepage', time: '2 hours ago' },
-        { type: 'join', user: 'Michael', time: '5 hours ago' },
-        { type: 'message', user: 'Emma', time: '1 day ago' },
-        { type: 'task', user: 'James', task: 'Fix bug in checkout', time: '2 days ago' }
-    ]
+  user: { name: 'Alex' },
+  stats: {
+    sales: 45230.50,
+    projects: 12,
+    teamSize: 8
+  },
+  activities: [
+    { type: 'task', user: 'Sarah', task: 'Update homepage', time: '2 hours ago' },
+    { type: 'join', user: 'Michael', time: '5 hours ago' },
+    { type: 'message', user: 'Emma', time: '1 day ago' },
+    { type: 'task', user: 'James', task: 'Fix bug in checkout', time: '2 days ago' }
+  ]
 }
 
 let currentLocale = 'en'
 
 function renderI18n() {
-    i18nEngine.locale = currentLocale
-    i18nEngine.clear() // Clear cache when locale changes
-    document.getElementById('i18n-output').innerHTML = i18nEngine.render(i18nTemplate, i18nData)
+  i18nEngine.locale = currentLocale
+  i18nEngine.clear() // Clear cache when locale changes
+  document.getElementById('i18n-output').innerHTML = i18nEngine.render(i18nTemplate, i18nData)
 }
 
 window.switchLang = function(lang) {
-    currentLocale = lang
+  currentLocale = lang
 
-    // Update UI
-    document.querySelectorAll('.lang-btn').forEach(btn =&gt; {
-        btn.classList.remove('active')
-    })
-    event.target.classList.add('active')
+  // Update UI
+  document.querySelectorAll('.lang-btn').forEach(btn =&gt; {
+    btn.classList.remove('active')
+  })
+  event.target.classList.add('active')
 
-    renderI18n()
+  renderI18n()
 }
 
 // Initial render
-renderI18n()</pre>
-      </div>
-
-      <div class="demo-container">
-        <div class="demo-controls">
-          <div class="lang-switcher">
-            <button class="lang-btn active" onclick="switchLang('en')">🇬🇧 English</button>
-            <button class="lang-btn" onclick="switchLang('fr')">🇫🇷 Français</button>
-            <button class="lang-btn" onclick="switchLang('es')">🇪🇸 Español</button>
-          </div>
+renderI18n()
+          </pre>
         </div>
-        <div class="demo-output" id="i18n-output"></div>
-      </div>
-    </section>
 
-    <!-- Section 5: Strict Mode -->
-    <section id="strict" class="section">
-      <div class="section-header">
-        <span class="section-number">5</span>
-        <h2>Strict Mode Plugin</h2>
-      </div>
+        <div class="demo-container">
+          <div class="demo-controls">
+            <div class="lang-switcher">
+              <button class="lang-btn active" onclick="switchLang('en')">🇬🇧 English</button>
+              <button class="lang-btn" onclick="switchLang('fr')">🇫🇷 Français</button>
+              <button class="lang-btn" onclick="switchLang('es')">🇪🇸 Español</button>
+            </div>
+          </div>
+          <div class="demo-output" id="i18n-output"></div>
+        </div>
+      </section>
 
-      <div class="code-block">
-        <pre>
+      <!-- Section 5: Strict Mode -->
+      <section id="strict" class="section">
+        <div class="section-header">
+          <span class="section-number">5</span>
+          <h2>Strict Mode Plugin</h2>
+        </div>
+
+        <div class="code-block">
+          <pre>
 const strictEngine = new TemplateEngine().use(StrictModePlugin)
 
 strictEngine.strict = true
 
 const renderStrict = function() {
-    const template = document.getElementById('strict-template').value
-    const output = document.getElementById('strict-output')
+  const template = document.getElementById('strict-template').value
+  const output = document.getElementById('strict-output')
 
-    // Data with intentional typo (userEmail missing)
-    const data = {
-        userName: 'John Doe'
-        // userEmail is missing - this will trigger strict mode error
-    }
+  // Data with intentional typo (userEmail missing)
+  const data = {
+    userName: 'John Doe'
+    // userEmail is missing - this will trigger strict mode error
+  }
 
-    try {
-        const html = strictEngine.render(template, data)
-        output.innerHTML = `
-      &lt;div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); color: var(--success); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;"&gt;
-        ✅ Strict mode passed! All variables are defined.
-      &lt;/div&gt;
-      ${html}
-    `
-    } catch (error) {
-        output.innerHTML = `
-      &lt;div class="error-message"&gt;
-        &lt;strong&gt;❌ Strict Mode Error:&lt;/strong&gt;&lt;br&gt;
-        ${error.message}
-      &lt;/div&gt;
-      &lt;div style="background: var(--bg-lighter); padding: 1.5rem; border-radius: 8px; margin-top: 1rem;"&gt;
-        &lt;h4&gt;Why did this fail?&lt;/h4&gt;
-        &lt;p style="color: var(--text-muted); margin-top: 0.5rem;"&gt;
-          Strict mode detected that you're trying to access &lt;code style="background: var(--bg); padding: 0.25rem 0.5rem; border-radius: 4px;"&gt;userEmail&lt;/code&gt;
-          but it's not defined in the data object. This helps catch typos and missing data early!
-        &lt;/p&gt;
-        &lt;p style="color: var(--text-muted); margin-top: 1rem;"&gt;
-          &lt;strong&gt;Available variables:&lt;/strong&gt; &lt;code style="background: var(--bg); padding: 0.25rem 0.5rem; border-radius: 4px;"&gt;${Object.keys(data).join(', ')}&lt;/code&gt;
-        &lt;/p&gt;
-      &lt;/div&gt;
-    `
-    }
+  try {
+    const html = strictEngine.render(template, data)
+    output.innerHTML = `
+&lt;div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); color: var(--success); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;"&gt;
+✅ Strict mode passed! All variables are defined.
+&lt;/div&gt;
+${html}
+`
+  } catch (error) {
+    output.innerHTML = `
+&lt;div class="error-message"&gt;
+&lt;strong&gt;❌ Strict Mode Error:&lt;/strong&gt;&lt;br&gt;
+${error.message}
+&lt;/div&gt;
+&lt;div style="background: var(--bg-lighter); padding: 1.5rem; border-radius: 8px; margin-top: 1rem;"&gt;
+&lt;h4&gt;Why did this fail?&lt;/h4&gt;
+&lt;p style="color: var(--text-muted); margin-top: 0.5rem;"&gt;
+Strict mode detected that you're trying to access &lt;code style="background: var(--bg); padding: 0.25rem 0.5rem; border-radius: 4px;"&gt;userEmail&lt;/code&gt;
+but it's not defined in the data object. This helps catch typos and missing data early!
+&lt;/p&gt;
+&lt;p style="color: var(--text-muted); margin-top: 1rem;"&gt;
+&lt;strong&gt;Available variables:&lt;/strong&gt; &lt;code style="background: var(--bg); padding: 0.25rem 0.5rem; border-radius: 4px;"&gt;${Object.keys(data).join(', ')}&lt;/code&gt;
+&lt;/p&gt;
+&lt;/div&gt;
+`
+  }
 }
 
 // Initial render
-renderStrict()</pre>
-      </div>
-
-      <div class="demo-container">
-        <div class="demo-controls">
-          <div class="input-group">
-            <label>Try accessing an undefined variable:</label>
-            <textarea id="strict-template">&lt;p&gt;Username: [[= userName ]]&lt;/p&gt;
-&lt;p&gt;Email: [[= userEmail ]]&lt;/p&gt;</textarea>
-          </div>
-          <button class="btn" onclick="renderStrict()">Test Strict Mode</button>
+renderStrict()
+          </pre>
         </div>
-        <div class="demo-output" id="strict-output"></div>
-      </div>
-    </section>
-  </main>
 
-  <script type="module" src="./static/main.js"></script>
-</body>
+        <div class="demo-container">
+          <div class="demo-controls">
+            <div class="input-group">
+              <label>Try accessing an undefined variable:</label>
+              <textarea id="strict-template">&lt;p&gt;Username: [[= userName ]]&lt;/p&gt;
+                &lt;p&gt;Email: [[= userEmail ]]&lt;/p&gt;</textarea>
+            </div>
+            <button class="btn" onclick="renderStrict()">Test Strict Mode</button>
+          </div>
+          <div class="demo-output" id="strict-output"></div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./static/main.js"></script>
+  </body>
 </html>

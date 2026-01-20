@@ -97,6 +97,232 @@ const renderPartials = function() {
 renderPartials()
 
 // ============================================================================
+// SECTION 2.1: DYNAMIC PARTIALS
+// ============================================================================
+
+import { DynamicPartialsPlugin } from '../../src/plugins/partials_dynamic.js'
+
+const dynamicEngine = new TemplateEngine()
+    .use(PartialsPlugin)
+    .use(DynamicPartialsPlugin)
+
+// Define different card types
+dynamicEngine.partial('loadingCard', `
+  <div class="card" style="text-align: center; padding: 3rem;">
+    <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
+    <div style="color: var(--text-muted);">Loading...</div>
+  </div>
+`)
+
+dynamicEngine.partial('errorCard', `
+  <div class="card" style="border-left: 4px solid var(--danger);">
+    <div style="font-size: 2rem; margin-bottom: 0.5rem;">❌</div>
+    <h4 style="color: var(--danger);">Error</h4>
+    <p style="color: var(--text-muted);">[[= message ]]</p>
+  </div>
+`)
+
+dynamicEngine.partial('successCard', `
+  <div class="card" style="border-left: 4px solid var(--success);">
+    <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+    <h4 style="color: var(--success);">Success</h4>
+    <p style="color: var(--text-muted);">[[= message ]]</p>
+  </div>
+`)
+
+dynamicEngine.partial('dataCard', `
+  <div class="card">
+    <h4>[[= title ]]</h4>
+    <p style="color: var(--text-muted);">[[= description ]]</p>
+    <div style="font-size: 2rem; font-weight: 700; color: var(--primary); margin-top: 1rem;">
+      [[= value ]]
+    </div>
+  </div>
+`)
+
+let currentState = 'loading'
+
+window.renderDynamic = function() {
+    const dynamicTemplate = `
+    <div style="margin-bottom: 2rem;">
+      <h3>Current State: <span style="color: var(--primary);">[[= state ]]</span></h3>
+      [[> (cardType) ]]
+    </div>
+
+    <h3 style="margin-top: 2rem;">Component Gallery</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+      [[ components.forEach(comp => { ]]
+        [[> (comp.type) ]]
+      [[ }) ]]
+    </div>
+  `
+
+    const stateData = {
+        loading: {
+            state: 'loading',
+            cardType: 'loadingCard'
+        },
+        error: {
+            state: 'error',
+            cardType: 'errorCard',
+            message: 'Failed to load data. Please try again.'
+        },
+        success: {
+            state: 'success',
+            cardType: 'successCard',
+            message: 'Data loaded successfully!'
+        },
+        data: {
+            state: 'data',
+            cardType: 'dataCard',
+            title: 'Active Users',
+            description: 'Total users this month',
+            value: '1,234'
+        }
+    }
+
+    const dynamicData = {
+        ...stateData[currentState],
+        components: [
+            { type: 'loadingCard' },
+            { type: 'errorCard', message: 'Connection timeout' },
+            { type: 'successCard', message: 'Order completed' },
+            { type: 'dataCard', title: 'Revenue', description: 'This quarter', value: '$45.2K' }
+        ]
+    }
+
+    document.getElementById('dynamic-output').innerHTML = dynamicEngine.render(dynamicTemplate, dynamicData)
+}
+
+window.changeState = function(state) {
+    currentState = state
+    // Update UI
+    document.querySelectorAll('.state-btn').forEach(btn => {
+        btn.classList.remove('active')
+    })
+    event.target.classList.add('active')
+
+    renderDynamic()
+}
+
+// Initial render
+renderDynamic()
+
+// ============================================================================
+// SECTION 2.2: PARAMS PARTIALS
+// ============================================================================
+
+import { ParamsPartialsPlugin } from '../../src/plugins/partials_params.js'
+
+const paramsEngine = new TemplateEngine()
+    .use(PartialsPlugin)
+    .use(ParamsPartialsPlugin)
+
+// Define reusable button component
+paramsEngine.partial('button', `
+  <button class="btn" style="
+    background: var(--[[= variant ]]);
+    padding: [[= size === 'small' ? '0.5rem 1rem' : size === 'large' ? '1rem 2rem' : '0.75rem 1.5rem' ]];
+    font-size: [[= size === 'small' ? '0.875rem' : size === 'large' ? '1.125rem' : '1rem' ]];
+    opacity: [[= typeof disabled !== 'undefined' && disabled === 'true' ? '0.5' : '1' ]];
+    cursor: [[= typeof disabled !== 'undefined' && disabled === 'true' ? 'not-allowed' : 'pointer' ]];
+  ">
+    [[= label ]]
+  </button>
+`)
+// Define alert component
+paramsEngine.partial('alert', `
+  <div class="card" style="
+    border-left: 4px solid var(--[[= type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'danger' ]]);
+    background: rgba([[= type === 'success' ? '16, 185, 129' : type === 'warning' ? '245, 158, 11' : '239, 68, 68' ]], 0.1);
+  ">
+    <div style="display: flex; align-items: start; gap: 1rem;">
+      <div style="font-size: 1.5rem;">
+        [[= type === 'success' ? '✅' : type === 'warning' ? '⚠️' : '❌' ]]
+      </div>
+      <div>
+        <h4 style="margin: 0 0 0.5rem 0;">[[= title ]]</h4>
+        <p style="margin: 0; color: var(--text-muted);">[[= message ]]</p>
+      </div>
+    </div>
+  </div>
+`)
+
+// Define card component
+paramsEngine.partial('productCard', `
+  <div class="product-card">
+    <div class="product-image" style="background: linear-gradient(135deg, var(--primary), var(--[[= color ]]));">
+      [[= icon ]]
+    </div>
+    <div class="product-info">
+      <div class="product-title">[[= name ]]</div>
+      <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.5rem 0;">
+        [[= description ]]
+      </p>
+      <div class="product-price">[[= price ]]</div>
+      [[ if (typeof badge !== 'undefined' && badge) { ]]
+        <span class="badge badge-[[= badge ]]" style="margin-top: 0.5rem; display: inline-block;">[[= badgeText ]]</span>
+      [[ } ]]
+    </div>
+  </div>
+`)
+
+const renderParams = function() {
+    const paramsTemplate = `
+    <h3>Button Variants</h3>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+      [[> button variant="primary" size="small" label="Small Primary" ]]
+      [[> button variant="primary" size="medium" label="Medium Primary" ]]
+      [[> button variant="primary" size="large" label="Large Primary" ]]
+      [[> button variant="secondary" size="medium" label="Secondary" ]]
+      [[> button variant="danger" size="medium" label="Delete" ]]
+      [[> button variant="success" size="medium" label="Confirm" ]]
+      [[> button variant="primary" size="medium" label="Disabled" disabled="true" ]]
+    </div>
+
+    <h3>Alert Components</h3>
+    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+      [[> alert type="success" title="Success!" message="Your changes have been saved successfully." ]]
+      [[> alert type="warning" title="Warning" message="This action cannot be undone." ]]
+      [[> alert type="error" title="Error" message="Failed to process your request." ]]
+    </div>
+
+    <h3>Product Cards with Parameters</h3>
+    <div class="product-grid">
+      [[> productCard
+          name="Premium Plan"
+          icon="🚀"
+          color="secondary"
+          description="Perfect for growing teams"
+          price="$49/mo"
+          badge="success"
+          badgeText="Popular" ]]
+
+      [[> productCard
+          name="Enterprise Plan"
+          icon="💼"
+          color="primary"
+          description="For large organizations"
+          price="$299/mo"
+          badge="warning"
+          badgeText="New" ]]
+
+      [[> productCard
+          name="Starter Plan"
+          icon="⭐"
+          color="success"
+          description="Great for individuals"
+          price="$9/mo" ]]
+    </div>
+  `
+
+    document.getElementById('params-output').innerHTML = paramsEngine.render(paramsTemplate, {})
+}
+
+// Auto-render on load
+renderParams()
+
+// ============================================================================
 // SECTION 3: HELPERS
 // ============================================================================
 
