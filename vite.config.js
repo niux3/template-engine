@@ -8,6 +8,8 @@ export default defineConfig({
                 'template-engine': resolve(__dirname, 'src/TemplateEngine.js'),
                 'plugins/index': resolve(__dirname, 'src/plugins/index.js'),
                 'plugins/partials': resolve(__dirname, 'src/plugins/partials.js'),
+                'plugins/partials_dynamic': resolve(__dirname, 'src/plugins/partials_dynamic.js'),
+                'plugins/partials_params': resolve(__dirname, 'src/plugins/partials_params.js'),
                 'plugins/helpers': resolve(__dirname, 'src/plugins/helpers.js'),
                 'plugins/strict': resolve(__dirname, 'src/plugins/strict.js'),
                 'plugins/i18n': resolve(__dirname, 'src/plugins/i18n.js'),
