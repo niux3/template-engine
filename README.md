@@ -542,7 +542,7 @@ Use **Strict Mode** to catch undefined variables and prevent typos from becoming
 | **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **TemplateEngine (full)** | 2.9 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Mustache.js | 3.2 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| EJS | 7 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| EJS | 4.3 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Handlebars | 26 kio | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
 
 **TemplateEngine is:**
