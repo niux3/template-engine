@@ -1,15 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { TemplateEngine } from '../src/TemplateEngine.js'
 import { PartialsPlugin } from '../src/plugins/partials.js'
-import { ParamsPartialsPlugin } from '../src/plugins/partials_params.js'
+import { withParams } from '../src/plugins/partials_params.js'
 
 describe('Params Partials Plugin', () => {
     let engine
 
     beforeEach(() => {
         engine = new TemplateEngine()
-            .use(PartialsPlugin)
-            .use(ParamsPartialsPlugin)
+            .use(withParams(PartialsPlugin))
     })
 
     describe('Basic parameter passing', () => {
