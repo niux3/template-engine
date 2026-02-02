@@ -100,11 +100,8 @@ renderPartials()
 // SECTION 2.1: DYNAMIC PARTIALS
 // ============================================================================
 
-import { DynamicPartialsPlugin } from '../../src/plugins/partials_dynamic.js'
-
 const dynamicEngine = new TemplateEngine()
     .use(PartialsPlugin)
-    .use(DynamicPartialsPlugin)
 
 // Define different card types
 dynamicEngine.partial('loadingCard', `
@@ -212,11 +209,9 @@ renderDynamic()
 // SECTION 2.2: PARAMS PARTIALS
 // ============================================================================
 
-import { ParamsPartialsPlugin } from '../../src/plugins/partials_params.js'
 
 const paramsEngine = new TemplateEngine()
     .use(PartialsPlugin)
-    .use(ParamsPartialsPlugin)
 
 // Define reusable button component
 paramsEngine.partial('button', `
