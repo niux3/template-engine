@@ -2,7 +2,7 @@
  * Params Decorator - Adds parameter support to PartialsPlugin
  * Syntax: [[> card title="Hello" color="red" ]]
  * @deprecated Use unified PartialsPlugin instead
- * @see unified_partials.js
+ * @see partials.js
  * @param {Plugin} basePlugin - Base PartialsCorePlugin
  * @returns {Plugin}
  */
