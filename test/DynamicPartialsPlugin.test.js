@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { TemplateEngine } from '../src/TemplateEngine.js'
 import { PartialsPlugin } from '../src/plugins/partials.js'
-import { withDynamic } from '../src/plugins/partials_dynamic.js'
+
 
 describe('Dynamic Partials Decorator', () => {
     let engine
 
     beforeEach(() => {
         engine = new TemplateEngine()
-            .use(withDynamic(PartialsPlugin))
+            .use(PartialsPlugin)
     })
 
     describe('Basic dynamic partial rendering', () => {

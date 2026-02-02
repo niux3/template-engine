@@ -1,10 +1,13 @@
 /**
  * Params Decorator - Adds parameter support to PartialsPlugin
  * Syntax: [[> card title="Hello" color="red" ]]
- * @param {Plugin} basePlugin - Base PartialsPlugin
+ * @deprecated Use unified PartialsPlugin instead
+ * @see unified_partials.js
+ * @param {Plugin} basePlugin - Base PartialsCorePlugin
  * @returns {Plugin}
  */
 export const withParams = (basePlugin) => (engine, ctx) => {
+    console.warn('withParams is deprecated, use PartialsPlugin from partials.js')
     // Initialize base plugin first
     basePlugin(engine, ctx)
 

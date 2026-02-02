@@ -1,10 +1,13 @@
 /**
  * Dynamic Decorator - Adds dynamic partial selection
  * Syntax: [[> (variableName) ]]
- * @param {Plugin} basePlugin - Base PartialsPlugin (or already decorated)
+ * @deprecated Use unified PartialsPlugin instead
+ * @see partials.js
+ * @param {Plugin} basePlugin - Base PartialsCorePlugin (or already decorated)
  * @returns {Plugin}
  */
 export const withDynamic = (basePlugin) => (engine, ctx) => {
+    console.warn('withDynamic is deprecated, use PartialsPlugin from partials.js')
     // Initialize base plugin first (might already have withParams)
     basePlugin(engine, ctx)
 
