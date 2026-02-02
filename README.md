@@ -86,9 +86,9 @@ Renders unescaped HTML (use with caution)
 
 TemplateEngine uses a modular plugin system. Import only what you need to keep your bundle small.
 
-### Partials Plugin (+200 bytes)
+### Partials Plugin (+800 bytes)
 
-Reusable template fragments.
+Reusable template fragments with three modes: simple, dynamic, and parameterized.
 
 ```javascript
 import { TemplateEngine } from '@niuxe/template-engine'
@@ -99,128 +99,38 @@ const engine = new TemplateEngine().use(PartialsPlugin)
 engine.partial('header', '<header><h1>[[= title ]]</h1></header>')
 engine.partial('footer', '<footer>© 2025</footer>')
 
+// 1. Simple partials
 const html = engine.render(`
   [[> header ]]
   <main>[[= content ]]</main>
   [[> footer ]]
 `, { title: 'My Site', content: 'Welcome!' })
-```
 
-**Syntax:** `[[> partialName ]]`
-
-### Dynamic Partials Plugin (+450 bytes)
-
-Select partials dynamically using variables - perfect for component libraries and conditional rendering.
-
-```javascript
-import { TemplateEngine } from '@niuxe/template-engine'
-import { PartialsPlugin } from '@niuxe/template-engine/plugins/partials'
-import { DynamicPartialsPlugin } from '@niuxe/template-engine/plugins/partials-dynamic'
-
-const engine = new TemplateEngine()
-  .use(PartialsPlugin)
-  .use(DynamicPartialsPlugin)
-
-// Register different layouts
+// 2. Dynamic partials - choose partial from variable
 engine.partial('adminLayout', '<div class="admin">[[= content ]]</div>')
 engine.partial('userLayout', '<div class="user">[[= content ]]</div>')
-engine.partial('guestLayout', '<div class="guest">[[= content ]]</div>')
 
-// Choose layout dynamically based on user role
-const html = engine.render('[[> (layoutType) ]]', {
-  layoutType: 'adminLayout',  // Variable determines which partial to use
-  content: 'Dashboard content'
+const layout = engine.render('[[> (layoutType) ]]', {
+  layoutType: 'adminLayout',
+  content: 'Dashboard'
 })
 
-// Works great in loops for rendering different component types
-engine.partial('imageCard', '<div class="image">Image</div>')
-engine.partial('videoCard', '<div class="video">Video</div>')
-engine.partial('textCard', '<div class="text">Text</div>')
-
-const items = engine.render(`
-  [[ items.forEach(item => { ]]
-    [[> (item.type) ]]
-  [[ }) ]]
-`, {
-  items: [
-    { type: 'imageCard' },
-    { type: 'videoCard' },
-    { type: 'textCard' }
-  ]
-})
-```
-
-**Syntax:** `[[> (variableName) ]]`
-
-**Features:**
-- Supports dot notation: `[[> (user.preferences.theme) ]]`
-- Works in loops and conditionals
-- Graceful fallback for undefined variables (renders empty string)
-
-### Params Partials Plugin (+400 bytes)
-
-Pass named parameters to partials - create reusable components with custom props.
-
-```javascript
-import { TemplateEngine } from '@niuxe/template-engine'
-import { PartialsPlugin } from '@niuxe/template-engine/plugins/partials'
-import { ParamsPartialsPlugin } from '@niuxe/template-engine/plugins/partials-params'
-
-const engine = new TemplateEngine()
-  .use(PartialsPlugin)
-  .use(ParamsPartialsPlugin)
-
-// Create a reusable button component
+// 3. Parameterized partials - pass custom props
 engine.partial('button', `
-  <button class="btn btn-[[= variant ]] btn-[[= size ]]" type="[[= type ]]">
+  <button class="btn-[[= variant ]]" type="[[= type ]]">
     [[= label ]]
   </button>
 `)
 
-// Use it with different parameters
-const html = engine.render(`
-  [[> button variant="primary" size="large" type="submit" label="Save Changes" ]]
-  [[> button variant="secondary" size="small" type="button" label="Cancel" ]]
-`, {})
-
-// Create alert component
-engine.partial('alert', `
-  <div class="alert alert-[[= type ]]" role="alert">
-    [[= message ]]
-  </div>
-`)
-
-const alerts = engine.render(`
-  [[> alert type="success" message="Operation successful!" ]]
-  [[> alert type="warning" message="Please be careful" ]]
-  [[> alert type="error" message="Something went wrong" ]]
+const button = engine.render(`
+  [[> button variant="primary" type="submit" label="Save" ]]
 `, {})
 ```
 
-**Syntax:** `[[> partialName key1="value1" key2="value2" ]]`
-
-**Features:**
-- Automatic type conversion: `"true"` → `true`, `"42"` → `42`
-- Parameters override context data
-- Mix with global context variables
-- Perfect for component libraries
-
-**Combining Dynamic + Params:**
-
-```javascript
-const engine = new TemplateEngine()
-  .use(PartialsPlugin)
-  .use(DynamicPartialsPlugin)
-  .use(ParamsPartialsPlugin)
-
-// You can use both features together!
-engine.partial('card', '<div class="[[= theme ]]">[[= title ]]</div>')
-
-// Dynamic partial selection + parameters
-engine.render('[[> (cardType) theme="dark" title="Hello" ]]', {
-  cardType: 'card'
-})
-```
+**Syntax:**
+- Simple: `[[> partialName ]]`
+- Dynamic: `[[> (variableName) ]]`
+- With params: `[[> partialName key="value" ]]`
 
 ### Helpers Plugin (+150 bytes)
 
@@ -257,10 +167,10 @@ const engine = new TemplateEngine().use(StrictModePlugin)
 engine.strict = true
 
 // ❌ Throws: Variable "userName" is not defined
-engine.render('[[= userName ]]', { userNaem: 'John' })
+engine.render('[[= userName ]]', { userNaem: 'Denis' })
 
 // ✅ Works fine
-engine.render('[[= userName ]]', { userName: 'John' })
+engine.render('[[= userName ]]', { userName: 'Denis' })
 ```
 
 Perfect for catching refactoring errors and validating API responses.
@@ -331,8 +241,6 @@ Plugins can be chained together:
 import { TemplateEngine } from '@niuxe/template-engine'
 import {
   PartialsPlugin,
-  DynamicPartialsPlugin,
-  ParamsPartialsPlugin,
   HelpersPlugin,
   StrictModePlugin,
   I18nPlugin
@@ -340,8 +248,6 @@ import {
 
 const engine = new TemplateEngine()
   .use(PartialsPlugin)
-  .use(DynamicPartialsPlugin)
-  .use(ParamsPartialsPlugin)
   .use(HelpersPlugin)
   .use(StrictModePlugin)
   .use(I18nPlugin)
@@ -358,6 +264,9 @@ const html = engine.render(`
   [[> badge text="New" ]]
   <p>[[= t("welcome") ]] [[= helpers.upper(name) ]]</p>
 `, { name: 'alice' })
+```
+
+**Total size with all plugins:** ~2.9 kio gzipped
 ```
 
 **Total size with all plugins:** ~2.2 kio gzipped
@@ -409,12 +318,9 @@ Useful when:
 
 ```javascript
 import { TemplateEngine } from '@niuxe/template-engine'
-import { PartialsPlugin, DynamicPartialsPlugin, ParamsPartialsPlugin } from '@niuxe/template-engine/plugins'
+import { PartialsPlugin } from '@niuxe/template-engine/plugins'
 
-const engine = new TemplateEngine()
-  .use(PartialsPlugin)
-  .use(DynamicPartialsPlugin)
-  .use(ParamsPartialsPlugin)
+const engine = new TemplateEngine().use(PartialsPlugin)
 
 // Define components
 engine.partial('button', '<button class="btn-[[= variant ]]">[[= label ]]</button>')
@@ -526,9 +432,7 @@ Use **Strict Mode** to catch undefined variables and prevent typos from becoming
 | Component | Minified + Gzipped |
 |-----------|-------------------|
 | **Core Engine** | **950 bytes** |
-| + Partials Plugin | +200 bytes |
-| + Dynamic Partials Plugin | +450 bytes |
-| + Params Partials Plugin | +400 bytes |
+| + Partials Plugin (all 3 modes) | +800 bytes |
 | + Helpers Plugin | +150 bytes |
 | + Strict Mode Plugin | +290 bytes |
 | + Async Plugin | +260 bytes |
@@ -537,8 +441,8 @@ Use **Strict Mode** to catch undefined variables and prevent typos from becoming
 
 ### Comparison with alternatives
 
-| Library | Size (gzipped) | Partials | Dynamic Partials | Parameters Partials | Helpers | I18n | Async |
-|---------|---------------|----------|------------------|------------|---------|------|-------|
+| Library | Size (gzipped) | Partials | Dynamic Partials | Params Partials | Helpers | I18n | Async |
+|---------|---------------|----------|------------------|-----------------|---------|------|-------|
 | **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **TemplateEngine (full)** | 2.9 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Mustache.js | 3.2 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -609,13 +513,13 @@ Works in all modern browsers and Node.js 14+.
 // Handlebars dynamic partials
 {{> (whichPartial) }}
 
-// TemplateEngine (with DynamicPartialsPlugin)
+// TemplateEngine (with PartialsPlugin)
 [[> (whichPartial) ]]
 
 // Handlebars with parameters
 {{> card title="Hello" theme="dark" }}
 
-// TemplateEngine (with ParamsPartialsPlugin)
+// TemplateEngine (with PartialsPlugin)
 [[> card title="Hello" theme="dark" ]]
 ```
 
@@ -624,7 +528,8 @@ Main differences:
 - `{{var}}` → `[[= var ]]`
 - `{{{raw}}}` → `[[-raw ]]`
 - `{{> name}}` → `[[> name ]]` (requires PartialsPlugin)
-- `{{> (dynamic)}}` → `[[> (dynamic) ]]` (requires DynamicPartialsPlugin)
+- `{{> (dynamic)}}` → `[[> (dynamic) ]]` (PartialsPlugin supports this)
+- `{{> name param="value"}}` → `[[> name param="value" ]]` (PartialsPlugin supports this)
 - `{{#each}}` → `[[ forEach ]]` (native JavaScript)
 
 ## Contributing
