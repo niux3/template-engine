@@ -15,7 +15,7 @@
 - **Fast**: Built-in compilation cache with LRU eviction
 - **Secure**: Auto-escapes HTML by default
 - **Simple**: Clean syntax, no build step required
-- **Modular**: Optional plugins for partials, helpers, strict mode, and async file rendering
+- **Modular**: Optional plugins for partials, helpers, layouts, strict mode, and async file rendering
 - **Pay for what you use**: Core is 950 bytes, add only the plugins you need
 
 ## Installation
@@ -132,6 +132,128 @@ const button = engine.render(`
 - Dynamic: `[[> (variableName) ]]`
 - With params: `[[> partialName key="value" ]]`
 
+### Layout Plugin (+650 bytes)
+
+Template inheritance with blocks, perfect for building multi-page applications with shared layouts.
+
+```javascript
+import { TemplateEngine } from '@niuxe/template-engine'
+import { LayoutPlugin } from '@niuxe/template-engine/plugins/layout'
+
+const engine = new TemplateEngine().use(LayoutPlugin)
+
+// Define a base layout
+engine.layout('base', `
+  <html>
+    <head>
+      <title>[[= title ]]</title>
+      [[block:styles]]
+        <link rel="stylesheet" href="default.css">
+      [[/block]]
+    </head>
+    <body>
+      [[block:header]]
+        <h1>Default Header</h1>
+      [[/block]]
+      [[block:content]][[/block]]
+      [[block:footer]]
+        <footer>© 2025</footer>
+      [[/block]]
+    </body>
+  </html>
+`)
+
+// Extend the layout in a page template
+const html = engine.render(`
+  [[extends:base]]
+  [[block:styles]]
+    [[parent]]
+    <link rel="stylesheet" href="custom.css">
+  [[/block]]
+  [[block:content]]
+    <main>
+      <h2>Welcome to my page</h2>
+      <p>[[= message ]]</p>
+    </main>
+  [[/block]]
+`, {
+  title: 'Home Page',
+  message: 'Hello World!'
+})
+```
+
+**Features:**
+- **Template inheritance**: Extend layouts with `[[extends:layoutName]]`
+- **Block system**: Define and override blocks with `[[block:name]]...[[/block]]`
+- **Parent content**: Include parent block content with `[[parent]]`
+- **Multi-level inheritance**: Layouts can extend other layouts (up to 10 levels)
+- **Nested blocks**: Blocks can contain other blocks for complex layouts
+
+**Syntax:**
+- Extend layout: `[[extends:layoutName]]`
+- Define block: `[[block:name]]content[[/block]]`
+- Include parent: `[[parent]]`
+
+**Advanced example - Multi-level inheritance:**
+
+```javascript
+// Base layout
+engine.layout('base', `
+  <html>
+    <head>[[block:styles]]<link rel="base.css">[[/block]]</head>
+    <body>[[block:content]][[/block]]</body>
+  </html>
+`)
+
+// Admin layout extends base
+engine.layout('admin', `
+  [[extends:base]]
+  [[block:styles]]
+    [[parent]]
+    <link rel="admin.css">
+  [[/block]]
+  [[block:content]]
+    <nav>Admin Navigation</nav>
+    [[block:main]][[/block]]
+  [[/block]]
+`)
+
+// Dashboard page extends admin
+const page = engine.render(`
+  [[extends:admin]]
+  [[block:styles]]
+    [[parent]]
+    <link rel="dashboard.css">
+  [[/block]]
+  [[block:main]]
+    <h1>Dashboard</h1>
+    <p>Welcome, admin!</p>
+  [[/block]]
+`, {})
+```
+
+**Result:**
+```html
+<html>
+  <head>
+    <link rel="base.css">
+    <link rel="admin.css">
+    <link rel="dashboard.css">
+  </head>
+  <body>
+    <nav>Admin Navigation</nav>
+    <h1>Dashboard</h1>
+    <p>Welcome, admin!</p>
+  </body>
+</html>
+```
+
+**Perfect for:**
+- Multi-page websites with shared layouts
+- Admin panels with nested layouts
+- Email templates with consistent structure
+- Blog themes with customizable sections
+
 ### Helpers Plugin (+150 bytes)
 
 Custom functions for formatting and transforming data.
@@ -241,6 +363,7 @@ Plugins can be chained together:
 import { TemplateEngine } from '@niuxe/template-engine'
 import {
   PartialsPlugin,
+  LayoutPlugin,
   HelpersPlugin,
   StrictModePlugin,
   I18nPlugin
@@ -248,6 +371,7 @@ import {
 
 const engine = new TemplateEngine()
   .use(PartialsPlugin)
+  .use(LayoutPlugin)
   .use(HelpersPlugin)
   .use(StrictModePlugin)
   .use(I18nPlugin)
@@ -256,20 +380,21 @@ engine.strict = true
 engine.locale = 'fr'
 engine.partial('badge', '<span class="badge">[[= text ]]</span>')
 engine.helper('upper', s => s.toUpperCase())
+engine.layout('base', '<html><body>[[block:content]][[/block]]</body></html>')
 engine.translations = {
   fr: { welcome: 'Bienvenue' }
 }
 
 const html = engine.render(`
-  [[> badge text="New" ]]
-  <p>[[= t("welcome") ]] [[= helpers.upper(name) ]]</p>
+  [[extends:base]]
+  [[block:content]]
+    [[> badge text="New" ]]
+    <p>[[= t("welcome") ]] [[= helpers.upper(name) ]]</p>
+  [[/block]]
 `, { name: 'alice' })
 ```
 
-**Total size with all plugins:** ~2.9 kio gzipped
-```
-
-**Total size with all plugins:** ~2.2 kio gzipped
+**Total size with all plugins:** ~3.2 kio gzipped
 
 ## Core API
 
@@ -314,6 +439,93 @@ Useful when:
 
 ## Advanced Examples
 
+### Multi-Page Website with Layouts
+
+```javascript
+import { TemplateEngine } from '@niuxe/template-engine'
+import { LayoutPlugin, HelpersPlugin } from '@niuxe/template-engine/plugins'
+
+const engine = new TemplateEngine()
+  .use(LayoutPlugin)
+  .use(HelpersPlugin)
+
+engine.helper('formatDate', date => new Date(date).toLocaleDateString())
+
+// Base layout
+engine.layout('base', `
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>[[= pageTitle ]] - My Site</title>
+      [[block:styles]][[/block]]
+    </head>
+    <body>
+      <header>
+        <nav>
+          <a href="/">Home</a>
+          <a href="/about">About</a>
+          <a href="/blog">Blog</a>
+        </nav>
+      </header>
+      <main>
+        [[block:content]][[/block]]
+      </main>
+      <footer>
+        <p>© [[= new Date().getFullYear() ]] My Site</p>
+      </footer>
+    </body>
+  </html>
+`)
+
+// Blog layout extends base
+engine.layout('blog', `
+  [[extends:base]]
+  [[block:styles]]
+    <link rel="stylesheet" href="/css/blog.css">
+  [[/block]]
+  [[block:content]]
+    <article>
+      [[block:article]][[/block]]
+    </article>
+    <aside>
+      [[block:sidebar]]
+        <h3>Recent Posts</h3>
+      [[/block]]
+    </aside>
+  [[/block]]
+`)
+
+// Blog post page
+const blogPost = engine.render(`
+  [[extends:blog]]
+  [[block:article]]
+    <h1>[[= post.title ]]</h1>
+    <time>[[= helpers.formatDate(post.date) ]]</time>
+    <div>[[-post.content ]]</div>
+  [[/block]]
+  [[block:sidebar]]
+    [[parent]]
+    <ul>
+    [[ recent.forEach(p => { ]]
+      <li><a href="/blog/[[= p.slug ]]">[[= p.title ]]</a></li>
+    [[ }) ]]
+    </ul>
+  [[/block]]
+`, {
+  pageTitle: 'My First Post',
+  post: {
+    title: 'Hello World',
+    date: '2025-01-15',
+    content: '<p>Welcome to my blog!</p>'
+  },
+  recent: [
+    { slug: 'second-post', title: 'Second Post' },
+    { slug: 'third-post', title: 'Third Post' }
+  ]
+})
+```
+
 ### Component Library with Dynamic Partials
 
 ```javascript
@@ -353,34 +565,83 @@ const widget = engine.render('[[> (state) message="Error occurred" data="Success
 })
 ```
 
-### Email Template with Partials
+### Email Template with Layouts and Partials
 
 ```javascript
-engine.partial('header', `
-  <div style="background: #333; color: white; padding: 20px;">
-    <h1>[[= companyName ]]</h1>
-  </div>
+import { TemplateEngine } from '@niuxe/template-engine'
+import { LayoutPlugin, PartialsPlugin, HelpersPlugin } from '@niuxe/template-engine/plugins'
+
+const engine = new TemplateEngine()
+  .use(LayoutPlugin)
+  .use(PartialsPlugin)
+  .use(HelpersPlugin)
+
+engine.helper('currency', price => `$${price.toFixed(2)}`)
+
+// Email base layout
+engine.layout('email', `
+  <!DOCTYPE html>
+  <html>
+    <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      [[block:header]]
+        <div style="background: #333; color: white; padding: 20px;">
+          <h1>[[= companyName ]]</h1>
+        </div>
+      [[/block]]
+      [[block:content]][[/block]]
+      [[block:footer]]
+        <div style="text-align: center; color: #666; padding: 20px;">
+          <p>© [[= year ]] [[= companyName ]]. All rights reserved.</p>
+        </div>
+      [[/block]]
+    </body>
+  </html>
 `)
 
-engine.partial('footer', `
-  <div style="text-align: center; color: #666;">
-    <p>© [[= year ]] [[= companyName ]]. All rights reserved.</p>
-  </div>
+// Partials for reusable components
+engine.partial('button', `
+  <a href="[[= url ]]" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; display: inline-block; border-radius: 5px;">
+    [[= text ]]
+  </a>
 `)
 
+// Order confirmation email
 const email = engine.render(`
-  [[> header ]]
-  <div style="padding: 20px;">
-    <p>Hi [[= userName ]],</p>
-    <p>Your order #[[= orderId ]] has been confirmed.</p>
-    <ul>
-    [[ items.forEach(item => { ]]
-      <li>[[= item.name ]] - [[= helpers.currency(item.price) ]]</li>
-    [[ }) ]]
-    </ul>
-    <p><strong>Total: [[= helpers.currency(total) ]]</strong></p>
-  </div>
-  [[> footer ]]
+  [[extends:email]]
+  [[block:content]]
+    <div style="padding: 20px;">
+      <h2>Order Confirmation</h2>
+      <p>Hi [[= userName ]],</p>
+      <p>Your order #[[= orderId ]] has been confirmed.</p>
+
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="border-bottom: 2px solid #ddd;">
+            <th style="text-align: left; padding: 10px;">Item</th>
+            <th style="text-align: right; padding: 10px;">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+        [[ items.forEach(item => { ]]
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 10px;">[[= item.name ]]</td>
+            <td style="text-align: right; padding: 10px;">[[= helpers.currency(item.price) ]]</td>
+          </tr>
+        [[ }) ]]
+        </tbody>
+        <tfoot>
+          <tr>
+            <td style="padding: 10px;"><strong>Total</strong></td>
+            <td style="text-align: right; padding: 10px;"><strong>[[= helpers.currency(total) ]]</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div style="margin-top: 30px; text-align: center;">
+        [[> button url="https://example.com/orders/12345" text="View Order" ]]
+      </div>
+    </div>
+  [[/block]]
 `, {
   companyName: 'ACME Inc',
   year: 2025,
@@ -433,27 +694,30 @@ Use **Strict Mode** to catch undefined variables and prevent typos from becoming
 |-----------|-------------------|
 | **Core Engine** | **950 bytes** |
 | + Partials Plugin (all 3 modes) | +800 bytes |
+| + Layout Plugin | +650 bytes |
 | + Helpers Plugin | +150 bytes |
 | + Strict Mode Plugin | +290 bytes |
-| + Async Plugin | +260 bytes |
 | + I18n Plugin | +230 bytes |
-| **All plugins combined** | **~2.9 kio** |
+| + Async Plugin | +260 bytes |
+| **All plugins combined** | **~3.2 kio** |
 
 ### Comparison with alternatives
 
-| Library | Size (gzipped) | Partials | Dynamic Partials | Params Partials | Helpers | I18n | Async |
-|---------|---------------|----------|------------------|-----------------|---------|------|-------|
-| **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **TemplateEngine (full)** | 2.9 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Mustache.js | 3.2 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| EJS | 4.3 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Handlebars | 26 kio | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Library | Size (gzipped) | Partials | Layouts | Dynamic Partials | Params Partials | Helpers | I18n | Async |
+|---------|---------------|----------|---------|------------------|-----------------|---------|------|-------|
+| **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **TemplateEngine (full)** | 3.2 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Mustache.js | 3.2 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| EJS | 7 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Handlebars | 26 kio | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Nunjucks | 32 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
 
 **TemplateEngine is:**
-- **3.4× lighter** than Mustache.js (core: 950 bytes vs 3.2 kio)
-- **7× lighter** than EJS (core: 950 bytes vs 7 kio)
-- **27× lighter** than Handlebars (core: 950 bytes vs 26 kio)
-- **Same features as Handlebars for 9× less** (full: 2.9 kio vs 26 kio)
+- **Same size as Mustache.js** (core: 950 bytes vs 3.2 kio) **but with more features when using plugins**
+- **2.2× lighter** than EJS (full: 3.2 kio vs 7 kio)
+- **8× lighter** than Handlebars (full: 3.2 kio vs 26 kio)
+- **10× lighter** than Nunjucks (full: 3.2 kio vs 32 kio)
+- **More features than Handlebars for 8× less** (layouts + all features: 3.2 kio vs 26 kio)
 
 ## Browser Support
 
@@ -474,9 +738,9 @@ Works in all modern browsers and Node.js 14+.
 - Simple syntax
 - Plugin extensibility
 - Component-based development (with Dynamic + Params plugins)
+- Layout inheritance (with Layout plugin)
 
 ❌ **What it doesn't do:**
-- No layout inheritance (use partials instead)
 - No precompilation to static files
 - No advanced i18n (plurals, date/currency formatting - use i18next instead)
 - No sandboxing (templates can execute any JavaScript)
@@ -484,6 +748,7 @@ Works in all modern browsers and Node.js 14+.
 **When to use:**
 - SPAs where bundle size matters
 - Component libraries and design systems
+- Multi-page websites with shared layouts
 - Simple server-side rendering
 - Email templates
 - Web components
@@ -491,7 +756,6 @@ Works in all modern browsers and Node.js 14+.
 **When NOT to use:**
 - User-submitted templates (security risk)
 - Complex CMS with untrusted content
-- Need for advanced template inheritance
 
 ## Migration from Handlebars
 
@@ -503,7 +767,7 @@ Works in all modern browsers and Node.js 14+.
   <li>{{name}}</li>
 {{/each}}
 
-// TemplateEngine (equivalent features, 14× smaller!)
+// TemplateEngine (equivalent features, 8× smaller!)
 [[> header ]]
 <h1>[[= title ]]</h1>
 [[ items.forEach(item => { ]]
@@ -532,6 +796,42 @@ Main differences:
 - `{{> name param="value"}}` → `[[> name param="value" ]]` (PartialsPlugin supports this)
 - `{{#each}}` → `[[ forEach ]]` (native JavaScript)
 
+## Migration from Nunjucks
+
+```javascript
+// Nunjucks
+{% extends "base.html" %}
+{% block content %}
+  <h1>{{ title }}</h1>
+{% endblock %}
+
+// TemplateEngine (with LayoutPlugin - 10× smaller!)
+[[extends:base]]
+[[block:content]]
+  <h1>[[= title ]]</h1>
+[[/block]]
+
+// Nunjucks parent block
+{% block styles %}
+  {{ super() }}
+  <link rel="custom.css">
+{% endblock %}
+
+// TemplateEngine
+[[block:styles]]
+  [[parent]]
+  <link rel="custom.css">
+[[/block]]
+```
+
+Main differences:
+- `{% %}` → `[[ ]]`
+- `{{ var }}` → `[[= var ]]`
+- `{% extends "base" %}` → `[[extends:base]]`
+- `{% block name %}` → `[[block:name]]`
+- `{{ super() }}` → `[[parent]]`
+- `{% include %}` → `[[> name ]]` (requires PartialsPlugin)
+
 ## Contributing
 
 Found a bug? Open an issue with a minimal reproduction.
@@ -544,7 +844,7 @@ MIT
 
 ## Acknowledgments
 
-Inspired by Handlebars, EJS, Underscore templates, and the pursuit of minimalism.
+Inspired by Handlebars, EJS, Nunjucks, Underscore templates, and the pursuit of minimalism.
 
 ---
 

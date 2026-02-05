@@ -28,10 +28,12 @@ body {
 }
 
 header {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--primary);
   padding: 2rem 0;
   position: sticky;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
@@ -70,10 +72,77 @@ header {
   font-weight: 600;
 }
 
-nav ul {
+nav > ul {
   display: flex;
   gap: 1.5rem;
   list-style: none;
+  align-items: center;
+}
+
+nav ul > li{
+  /* margin-top: 8px; */
+}
+
+nav ul li:has(>span) {
+  position: relative;
+  margin-top: 0;
+  padding: 0 1rem;
+  cursor: pointer;
+}
+
+nav ul li:has(>span):hover {
+  background-color: var(--secondary);
+  border-radius: 6px;
+}
+
+nav ul li:has(>span) > span {
+  display: block;
+  padding: 0.5rem 0;
+  color: var(--text);
+  font-weight: 500;
+  user-select: none;
+}
+
+nav ul li:has(>span) > span::after {
+  content: '▼';
+  font-size: 0.7em;
+  margin-left: 0.5rem;
+  opacity: 0.6;
+}
+
+nav ul li:has(>span) ul {
+  display: none;
+  margin: 0;
+  padding: 0.5rem 0;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  flex-direction: column;
+  background-color: var(--secondary);
+  position: absolute;
+  border-radius: 6px;
+  z-index: 1000;
+  list-style: none;
+}
+
+nav ul li:has(>span):hover ul {
+  display: flex;
+}
+
+nav ul li:has(>span) ul li {
+  margin: 0;
+}
+
+nav ul li:has(>span) ul li a {
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  display: block;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+nav ul li:has(>span) ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 nav a {
@@ -85,8 +154,8 @@ nav a {
   transition: background 0.2s;
 }
 
-nav a:hover {
-  background: rgba(255, 255, 255, 0.1);
+nav > ul > li > a:hover {
+  background: var(--secondary);
 }
 
 main {

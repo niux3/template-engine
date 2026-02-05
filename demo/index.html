@@ -19,9 +19,21 @@
         <nav>
           <ul>
             <li><a href="#basic">Basic</a></li>
-            <li><a href="#partials">Partials</a></li>
-            <li><a href="#dynamic">Dynamic</a></li>
-            <li><a href="#params">Params</a></li>
+            <li>
+              <span>Partials</span>
+              <ul>
+                <li><a href="#partials">Partials</a></li>
+                <li><a href="#dynamic">Dynamic</a></li>
+                <li><a href="#params">Params</a></li>
+              </ul>
+            </li>
+            <li>
+              <span>Layout</span>
+              <ul>
+                <li><a href="#layout-basic">Layout basic</a></li>
+                <li><a href="#layout-multi">Layout multi level</a></li>
+              </ul>
+            </li>
             <li><a href="#helpers">Helpers</a></li>
             <li><a href="#i18n">i18n</a></li>
             <li><a href="#strict">Strict</a></li>
@@ -80,10 +92,10 @@ renderBasic()
         </div>
       </section>
 
-      <!-- Section 2: Partials -->
+      <!-- Section 2.1: Partials -->
       <section id="partials" class="section">
         <div class="section-header">
-          <span class="section-number">2</span>
+          <span class="section-number">2.1</span>
           <h2>Partials Plugin</h2>
         </div>
 
@@ -152,10 +164,10 @@ renderPartials()
         </div>
       </section>
 
-      <!-- Section 2.1: Dynamic Partials -->
+      <!-- Section 2.2: Dynamic Partials -->
       <section id="dynamic" class="section">
         <div class="section-header">
-          <span class="section-number">2.1</span>
+          <span class="section-number">2.2</span>
           <h2>Dynamic Partials Plugin</h2>
         </div>
 
@@ -200,10 +212,10 @@ engine.render(template, { cardType: 'successCard' })  // Shows success
         </div>
       </section>
 
-      <!-- Section 2.2: Params Partials -->
+      <!-- Section 2.3: Params Partials -->
       <section id="params" class="section">
         <div class="section-header">
-          <span class="section-number">2.2</span>
+          <span class="section-number">2.3</span>
           <h2>Params Partials Plugin</h2>
         </div>
 
@@ -242,12 +254,149 @@ paramsEngine.render(
         </div>
       </section>
 
+<!-- Section 3.1: Layout Plugin - Basic -->
+      <section id="layout-basic" class="section">
+        <div class="section-header">
+          <span class="section-number">3.1</span>
+          <h2>Layout Plugin</h2>
+        </div>
 
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">
+          Template inheritance with blocks - perfect for building multi-page applications with shared layouts.
+        </p>
 
-      <!-- Section 3: Helpers -->
+        <div class="code-block">
+          <pre>
+const layoutEngine = new TemplateEngine().use(LayoutPlugin)
+
+// Define a base layout
+layoutEngine.layout('base', `
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;[[= title ]]&lt;/title&gt;
+    [[block:styles]]
+      &lt;link rel="stylesheet" href="default.css"&gt;
+    [[/block]]
+  &lt;/head&gt;
+  &lt;body&gt;
+    [[block:header]]
+      &lt;header&gt;&lt;h1&gt;Default Header&lt;/h1&gt;&lt;/header&gt;
+    [[/block]]
+    [[block:content]][[/block]]
+    [[block:footer]]
+      &lt;footer&gt;© 2026 My Site&lt;/footer&gt;
+    [[/block]]
+  &lt;/body&gt;
+&lt;/html&gt;
+`)
+
+// Extend the layout
+const html = layoutEngine.render(`
+  [[extends:base]]
+  [[block:styles]]
+    [[parent]]
+    &lt;link rel="stylesheet" href="custom.css"&gt;
+  [[/block]]
+  [[block:content]]
+    &lt;main&gt;
+      &lt;h2&gt;Welcome!&lt;/h2&gt;
+      &lt;p&gt;[[= message ]]&lt;/p&gt;
+    &lt;/main&gt;
+  [[/block]]
+`, {
+  title: 'Home Page',
+  message: 'Hello from the layout!'
+})
+          </pre>
+        </div>
+
+        <div class="demo-container">
+          <div class="demo-controls">
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-weight: 500;">
+                Switch Content:
+              </label>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="content-btn active" onclick="switchLayoutContent('home')">🏠 Home</button>
+                <button class="content-btn" onclick="switchLayoutContent('about')">ℹ️ About</button>
+                <button class="content-btn" onclick="switchLayoutContent('contact')">📧 Contact</button>
+              </div>
+            </div>
+          </div>
+          <div class="demo-output" id="layout-output"></div>
+        </div>
+      </section>
+
+      <!-- Section 3.2: Layout Plugin - Multi-level -->
+      <section id="layout-multi" class="section">
+        <div class="section-header">
+          <span class="section-number">3.2</span>
+          <h2>Multi-level Layout Inheritance</h2>
+        </div>
+
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">
+          Layouts can extend other layouts - perfect for admin panels and complex page hierarchies.
+        </p>
+
+        <div class="code-block">
+          <pre>
+// Base layout
+layoutEngine.layout('base', `
+&lt;html&gt;
+  &lt;head&gt;[[block:styles]]&lt;link rel="base.css"&gt;[[/block]]&lt;/head&gt;
+  &lt;body&gt;[[block:content]][[/block]]&lt;/body&gt;
+&lt;/html&gt;
+`)
+
+// Admin layout extends base
+layoutEngine.layout('admin', `
+  [[extends:base]]
+  [[block:styles]]
+    [[parent]]
+    &lt;link rel="admin.css"&gt;
+  [[/block]]
+  [[block:content]]
+    &lt;nav&gt;Admin Navigation&lt;/nav&gt;
+    [[block:main]][[/block]]
+  [[/block]]
+`)
+
+// Dashboard page extends admin
+const page = layoutEngine.render(`
+  [[extends:admin]]
+  [[block:styles]]
+    [[parent]]
+    &lt;link rel="dashboard.css"&gt;
+  [[/block]]
+  [[block:main]]
+    &lt;h1&gt;Dashboard&lt;/h1&gt;
+    &lt;div class="stats"&gt;[[= stats ]]&lt;/div&gt;
+  [[/block]]
+`, { stats: '42 active users' })
+          </pre>
+        </div>
+
+        <div class="demo-container">
+          <div class="demo-controls">
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-weight: 500;">
+                Switch Admin Page:
+              </label>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="admin-btn active" onclick="switchAdminPage('dashboard')">📊 Dashboard</button>
+                <button class="admin-btn" onclick="switchAdminPage('users')">👥 Users</button>
+                <button class="admin-btn" onclick="switchAdminPage('settings')">⚙️ Settings</button>
+              </div>
+            </div>
+          </div>
+          <div class="demo-output" id="layout-multi-output"></div>
+        </div>
+      </section>
+
+      <!-- Section 4: Helpers -->
       <section id="helpers" class="section">
         <div class="section-header">
-          <span class="section-number">3</span>
+          <span class="section-number">4</span>
           <h2>Helpers Plugin</h2>
         </div>
 
@@ -377,10 +526,10 @@ renderHelpers()
         </div>
       </section>
 
-      <!-- Section 4: i18n -->
+      <!-- Section 5: i18n -->
       <section id="i18n" class="section">
         <div class="section-header">
-          <span class="section-number">4</span>
+          <span class="section-number">5</span>
           <h2>i18n Plugin</h2>
         </div>
 
@@ -536,10 +685,10 @@ renderI18n()
         </div>
       </section>
 
-      <!-- Section 5: Strict Mode -->
+      <!-- Section 6: Strict Mode -->
       <section id="strict" class="section">
         <div class="section-header">
-          <span class="section-number">5</span>
+          <span class="section-number">6</span>
           <h2>Strict Mode Plugin</h2>
         </div>
 

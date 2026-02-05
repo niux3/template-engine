@@ -8,6 +8,7 @@ export default defineConfig({
                 'template-engine': resolve(__dirname, 'src/TemplateEngine.js'),
                 'plugins/index': resolve(__dirname, 'src/plugins/index.js'),
                 'plugins/partials': resolve(__dirname, 'src/plugins/partials.js'),
+                'plugins/layout': resolve(__dirname, 'src/plugins/layout.js'),
                 'plugins/experiments/partials_core': resolve(__dirname, 'src/plugins/experiments/partials_core.js'),
                 'plugins/experiments/partials_dynamic': resolve(__dirname, 'src/plugins/experiments/partials_dynamic.js'),
                 'plugins/experiments/partials_params': resolve(__dirname, 'src/plugins/experiments/partials_params.js'),

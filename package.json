@@ -18,6 +18,10 @@
       "import": "./dist/plugins/partials.js",
       "default": "./dist/plugins/partials.js"
     },
+    "./plugins/layout": {
+      "import": "./dist/plugins/layout.js",
+      "default": "./dist/plugins/layout.js"
+    },
     "./plugins/experiments/partials_core": {
       "import": "./dist/plugins/experiments/partials_core.js",
       "default": "./dist/plugins/experiments/partials_core.js"

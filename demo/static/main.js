@@ -2,6 +2,7 @@
 // Adjust these imports based on your actual build setup
 import { TemplateEngine } from '../../src/TemplateEngine.js'
 import { PartialsPlugin } from '../../src/plugins/partials.js'
+import { LayoutPlugin } from '../../src/plugins/layout.js'
 import { HelpersPlugin } from '../../src/plugins/helpers.js'
 import { I18nPlugin } from '../../src/plugins/i18n.js'
 import { StrictModePlugin } from '../../src/plugins/strict.js'
@@ -19,7 +20,7 @@ const renderBasic = function() {
     const data = {
         title: 'Dashboard',
         user: {
-            name: 'Alice Johnson',
+            name: 'Alice Martin',
             role: 'Developer'
         },
         notifications: 5
@@ -37,7 +38,7 @@ const renderBasic = function() {
 renderBasic()
 
 // ============================================================================
-// SECTION 2: PARTIALS
+// SECTION 2.1: PARTIALS
 // ============================================================================
 
 const partialsEngine = new TemplateEngine().use(PartialsPlugin)
@@ -78,9 +79,9 @@ const renderPartials = function() {
 
     const partialsData = {
         team: [
-            { name: 'Alice Johnson', role: 'Frontend Dev', email: 'alice@example.com', joined: '2023-01-15' },
-            { name: 'Bob Smith', role: 'Backend Dev', email: 'bob@example.com', joined: '2023-03-22' },
-            { name: 'Carol Williams', role: 'UI/UX Designer', email: 'carol@example.com', joined: '2023-06-10' }
+            { name: 'Alice MArtin', role: 'Frontend Dev', email: 'alice@example.com', joined: '2023-01-15' },
+            { name: 'Bob Marley', role: 'Backend Dev', email: 'bob@example.com', joined: '2023-03-22' },
+            { name: 'Carole Laure', role: 'UI/UX Designer', email: 'carole@example.com', joined: '2023-06-10' }
         ],
         stats: [
             { value: '1,234', label: 'Active Users' },
@@ -97,7 +98,7 @@ const renderPartials = function() {
 renderPartials()
 
 // ============================================================================
-// SECTION 2.1: DYNAMIC PARTIALS
+// SECTION 2.2: DYNAMIC PARTIALS
 // ============================================================================
 
 const dynamicEngine = new TemplateEngine()
@@ -206,7 +207,7 @@ window.changeState = function(state) {
 renderDynamic()
 
 // ============================================================================
-// SECTION 2.2: PARAMS PARTIALS
+// SECTION 2.3: PARAMS PARTIALS
 // ============================================================================
 
 
@@ -318,7 +319,316 @@ const renderParams = function() {
 renderParams()
 
 // ============================================================================
-// SECTION 3: HELPERS
+// SECTION 3.1: LAYOUT PLUGIN - BASIC
+// ============================================================================
+
+const layoutEngine = new TemplateEngine().use(LayoutPlugin)
+
+// Define base layout
+layoutEngine.layout('base', `
+  <html>
+    <head>
+      <title>[[= title ]]</title>
+      [[block:styles]]
+        <style>
+          body.body-basic-layout { font-family: system-ui; padding: 2rem; background: var(--bg); }
+          .page-header { background: var(--primary); color: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+          .page-content { background: var(--bg-lighter); padding: 2rem; border-radius: 8px; margin-bottom: 2rem; }
+          .page-footer { text-align: center; color: var(--text-muted); padding: 1rem; }
+        </style>
+      [[/block]]
+    </head>
+    <body class="body-basic-layout">
+      [[block:header]]
+        <div class="page-header">
+          <h1>Default Header</h1>
+        </div>
+      [[/block]]
+      [[block:content]][[/block]]
+      [[block:footer]]
+        <div class="page-footer">
+          <p>© 2026 My Site. All rights reserved.</p>
+        </div>
+      [[/block]]
+    </body>
+  </html>
+`)
+
+let currentLayoutContent = 'home'
+
+function renderLayout() {
+    const templates = {
+        home: `
+          [[extends:base]]
+          [[block:styles]]
+            [[parent]]
+            <style>.highlight { color: var(--primary); font-weight: 600; }</style>
+          [[/block]]
+          [[block:header]]
+            <div class="page-header">
+              <h1>🏠 Home Page</h1>
+              <p style="margin-top: 0.5rem; opacity: 0.9;">Welcome to our amazing website</p>
+            </div>
+          [[/block]]
+          [[block:content]]
+            <div class="page-content">
+              <h2>Welcome!</h2>
+              <p>This is the <span class="highlight">home page</span> extending the base layout.</p>
+              <p>Notice how the styles and footer are inherited from the base layout, but we've customized the header and content.</p>
+              <ul>
+                <li>✅ Base layout provides the HTML structure</li>
+                <li>✅ Custom header with emoji and description</li>
+                <li>✅ Extended styles with [[parent]] directive</li>
+                <li>✅ Footer automatically inherited</li>
+              </ul>
+            </div>
+          [[/block]]
+        `,
+        about: `
+          [[extends:base]]
+          [[block:styles]]
+            [[parent]]
+            <style>
+              .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+              .team-card { background: var(--bg); padding: 1.5rem; border-radius: 8px; text-align: center; }
+            </style>
+          [[/block]]
+          [[block:content]]
+            <div class="page-content">
+              <h2>About Us</h2>
+              <p>We're a team of passionate developers building amazing things.</p>
+              <div class="team-grid">
+                <div class="team-card">
+                  <div style="font-size: 3rem;">👨‍💻</div>
+                  <h3>Alice</h3>
+                  <p style="color: var(--text-muted);">Frontend Dev</p>
+                </div>
+                <div class="team-card">
+                  <div style="font-size: 3rem;">👩‍💻</div>
+                  <h3>Bob</h3>
+                  <p style="color: var(--text-muted);">Backend Dev</p>
+                </div>
+                <div class="team-card">
+                  <div style="font-size: 3rem;">🎨</div>
+                  <h3>Carol</h3>
+                  <p style="color: var(--text-muted);">Designer</p>
+                </div>
+              </div>
+            </div>
+          [[/block]]
+        `,
+        contact: `
+          [[extends:base]]
+          [[block:header]]
+            <div class="page-header">
+              <h1>📧 Contact Us</h1>
+            </div>
+          [[/block]]
+          [[block:content]]
+            <div class="page-content">
+              <h2>Get in Touch</h2>
+              <p>We'd love to hear from you!</p>
+              <div style="margin-top: 1.5rem;">
+                <p>📧 Email: contact@example.com</p>
+                <p>📱 Phone: +33 6 010 203 045</p>
+                <p>📍 Free street</p>
+              </div>
+              <button class="btn" style="margin-top: 1.5rem;">Send Message</button>
+            </div>
+          [[/block]]
+        `
+    }
+
+    const html = layoutEngine.render(templates[currentLayoutContent], {
+        title: currentLayoutContent.charAt(0).toUpperCase() + currentLayoutContent.slice(1)
+    })
+
+    document.getElementById('layout-output').innerHTML = html
+}
+
+window.switchLayoutContent = function(content) {
+    currentLayoutContent = content
+
+    // Update UI
+    document.querySelectorAll('.content-btn').forEach(btn => {
+        btn.classList.remove('active')
+    })
+    event.target.classList.add('active')
+
+    renderLayout()
+}
+
+// Initial render
+renderLayout()
+
+// ============================================================================
+// SECTION 3.1: LAYOUT PLUGIN - MULTI-LEVEL
+// ============================================================================
+
+const multiLayoutEngine = new TemplateEngine().use(LayoutPlugin)
+
+// Base layout
+multiLayoutEngine.layout('base', `
+  <div style="border: 3px solid var(--primary); border-radius: 8px; overflow: hidden;">
+    <div style="background: var(--primary); color: white; padding: 0.5rem 1rem; font-weight: 600;">
+      🌐 Base Layout (Level 1)
+    </div>
+    <div style="padding: 1rem;">
+      [[block:styles]]
+        <div style="background: var(--bg-lighter); padding: 0.5rem; border-radius: 4px; margin-bottom: 1rem;">
+          📄 <code>base.css</code> loaded
+        </div>
+      [[/block]]
+      [[block:content]][[/block]]
+    </div>
+  </div>
+`)
+
+// Admin layout extends base
+multiLayoutEngine.layout('admin', `
+  [[extends:base]]
+  [[block:styles]]
+    [[parent]]
+    <div style="background: var(--bg-lighter); padding: 0.5rem; border-radius: 4px; margin-bottom: 1rem;">
+      🔐 <code>admin.css</code> loaded
+    </div>
+  [[/block]]
+  [[block:content]]
+    <div style="border: 2px solid var(--secondary); border-radius: 8px; overflow: hidden; margin-bottom: 1rem;">
+      <div style="background: var(--secondary); color: white; padding: 0.5rem 1rem; font-weight: 600;">
+        🔑 Admin Layout (Level 2)
+      </div>
+      <div style="padding: 1rem;">
+        <div style="background: var(--bg); padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+          🧭 <strong>Admin Navigation:</strong> Dashboard | Users | Settings | Reports
+        </div>
+        [[block:main]][[/block]]
+      </div>
+    </div>
+  [[/block]]
+`)
+
+let currentAdminPage = 'dashboard'
+
+function renderMultiLayout() {
+    const pages = {
+        dashboard: `
+          [[extends:admin]]
+          [[block:styles]]
+            [[parent]]
+            <div style="background: var(--bg-lighter); padding: 0.5rem; border-radius: 4px; margin-bottom: 1rem;">
+              📊 <code>dashboard.css</code> loaded
+            </div>
+          [[/block]]
+          [[block:main]]
+            <div style="border: 2px solid var(--success); border-radius: 8px; overflow: hidden;">
+              <div style="background: var(--success); color: white; padding: 0.5rem 1rem; font-weight: 600;">
+                📊 Dashboard Page (Level 3)
+              </div>
+              <div style="padding: 1rem;">
+                <h3 style="margin-top: 0;">Dashboard Overview</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                  <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; color: var(--primary);">1,234</div>
+                    <div style="color: var(--text-muted);">Active Users</div>
+                  </div>
+                  <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; color: var(--success);">89%</div>
+                    <div style="color: var(--text-muted);">Uptime</div>
+                  </div>
+                  <div class="card" style="text-align: center;">
+                    <div style="font-size: 2rem; color: var(--secondary);">$12.5K</div>
+                    <div style="color: var(--text-muted);">Revenue</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          [[/block]]
+        `,
+        users: `
+          [[extends:admin]]
+          [[block:styles]]
+            [[parent]]
+            <div style="background: var(--bg-lighter); padding: 0.5rem; border-radius: 4px; margin-bottom: 1rem;">
+              👥 <code>users.css</code> loaded
+            </div>
+          [[/block]]
+          [[block:main]]
+            <div style="border: 2px solid var(--primary); border-radius: 8px; overflow: hidden;">
+              <div style="background: var(--primary); color: white; padding: 0.5rem 1rem; font-weight: 600;">
+                👥 Users Management (Level 3)
+              </div>
+              <div style="padding: 1rem;">
+                <h3 style="margin-top: 0;">User List</h3>
+                <div style="background: var(--bg); padding: 1rem; border-radius: 4px;">
+                  <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                    👤 <strong>Alice Johnson</strong> - alice@example.com
+                  </div>
+                  <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                    👤 <strong>Bob Smith</strong> - bob@example.com
+                  </div>
+                  <div style="padding: 0.5rem 0;">
+                    👤 <strong>Carol Williams</strong> - carol@example.com
+                  </div>
+                </div>
+              </div>
+            </div>
+          [[/block]]
+        `,
+        settings: `
+          [[extends:admin]]
+          [[block:styles]]
+            [[parent]]
+            <div style="background: var(--bg-lighter); padding: 0.5rem; border-radius: 4px; margin-bottom: 1rem;">
+              ⚙️ <code>settings.css</code> loaded
+            </div>
+          [[/block]]
+          [[block:main]]
+            <div style="border: 2px solid var(--warning); border-radius: 8px; overflow: hidden;">
+              <div style="background: var(--warning); color: white; padding: 0.5rem 1rem; font-weight: 600;">
+                ⚙️ Settings Page (Level 3)
+              </div>
+              <div style="padding: 1rem;">
+                <h3 style="margin-top: 0;">Application Settings</h3>
+                <div style="background: var(--bg); padding: 1rem; border-radius: 4px;">
+                  <label style="display: block; margin-bottom: 0.5rem;">
+                    <input type="checkbox" checked> Enable notifications
+                  </label>
+                  <label style="display: block; margin-bottom: 0.5rem;">
+                    <input type="checkbox" checked> Dark mode
+                  </label>
+                  <label style="display: block; margin-bottom: 0.5rem;">
+                    <input type="checkbox"> Two-factor authentication
+                  </label>
+                  <button class="btn" style="margin-top: 1rem;">Save Settings</button>
+                </div>
+              </div>
+            </div>
+          [[/block]]
+        `
+    }
+
+    const html = multiLayoutEngine.render(pages[currentAdminPage], {})
+    document.getElementById('layout-multi-output').innerHTML = html
+}
+
+window.switchAdminPage = function(page) {
+    currentAdminPage = page
+
+    // Update UI
+    document.querySelectorAll('.admin-btn').forEach(btn => {
+        btn.classList.remove('active')
+    })
+    event.target.classList.add('active')
+
+    renderMultiLayout()
+}
+
+// Initial render
+renderMultiLayout()
+
+// ============================================================================
+// SECTION 4: HELPERS
 // ============================================================================
 
 const helpersEngine = new TemplateEngine().use(HelpersPlugin)
@@ -439,7 +749,7 @@ window.renderHelpers = function() {
 renderHelpers()
 
 // ============================================================================
-// SECTION 4: i18n
+// SECTION 5: i18n
 // ============================================================================
 
 const i18nEngine = new TemplateEngine().use(I18nPlugin).use(HelpersPlugin)
@@ -579,7 +889,7 @@ window.switchLang = function(lang) {
 renderI18n()
 
 // ============================================================================
-// SECTION 5: STRICT MODE
+// SECTION 6: STRICT MODE
 // ============================================================================
 
 const strictEngine = new TemplateEngine().use(StrictModePlugin)
