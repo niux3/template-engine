@@ -65,7 +65,8 @@
     "build:vite": "vite build",
     "prepublishOnly": "npm run build && npm test",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "node -e \"console.log('\\x1b[35m%s\\x1b[0m', '⭐ Thank you for using TemplateEngine! If you like it, consider starring it on GitHub: https://github.com/niux3/template-engine')\""
   },
   "keywords": [
     "template",

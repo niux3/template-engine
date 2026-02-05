@@ -838,6 +838,10 @@ Found a bug? Open an issue with a minimal reproduction.
 
 Want to add a plugin? PRs welcome! Keep it small and focused.
 
+## Support the project
+
+If you find this engine useful, please consider giving it a ⭐ on [GitHub](https://github.com/niux3/template-engine). It helps more developers discover the project!
+
 ## License
 
 MIT
