@@ -74,6 +74,9 @@
     "templating",
     "lightweight",
     "tiny",
+    "zero-dependency",
+    "edge",
+    "performance",
     "html",
     "rendering",
     "escaping",
@@ -82,7 +85,11 @@
     "cache",
     "partials",
     "helpers",
-    "i18n"
+    "layouts",
+    "inheritance",
+    "i18n",
+    "strict-mode",
+    "async"
   ],
   "author": "niux3",
   "license": "MIT",
