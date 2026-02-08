@@ -7,20 +7,23 @@
  * engine.render('[[= helpers.upper(name) ]]', { name: 'alice' })
  */
 export const HelpersPlugin = (engine, ctx) => {
-    const helpers = {}
+    const fns = {}
 
-    /**
-     * Register a helper function
-     * @param {string} name - Helper name
-     * @param {Function} fn - Helper function
-     * @returns {object} Engine instance for chaining
-     */
     engine.helper = (name, fn) => {
-        helpers[name] = fn
+        fns[name] = fn
         return engine
     }
 
-    // Ajouter helpers en paramètre de la fonction compilée
+    const createChain = (val) => new Proxy({ _: val }, {
+        get: (t, k) => k === 'valueOf' || k === 'toString' ? () => t._
+            : fns[k] ? (...a) => createChain(fns[k](t._, ...a)) : undefined
+    })
+
+    const helpers = new Proxy(createChain, {
+        get: (target, key) => fns[key] || target[key],
+        apply: (target, thisArg, args) => target(...args)
+    })
+
     if (!ctx.extraParams) ctx.extraParams = []
     ctx.extraParams.push('helpers')
 
