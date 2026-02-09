@@ -413,7 +413,7 @@ const html = engine.render(`
 `, { name: 'alice' })
 ```
 
-**Total size with all plugins:** ~3.2 kio gzipped
+**Total size with all plugins:** ~3.3 kio gzipped
 
 ## Core API
 
@@ -582,7 +582,7 @@ const userCard = engine.render(`
   </div>
 `, {
   user: {
-    name: 'Alice Smith',
+    name: 'Alice Michu',
     bio: '  Software engineer passionate about clean code and minimal design. Loves open source and teaching.  ',
     tags: ['javascript', 'react', 'node']
   }
@@ -590,9 +590,9 @@ const userCard = engine.render(`
 
 // Output:
 // <div class="user-card">
-//   <h2>ALICE SMITH</h2>
+//   <h2>ALICE MICHU</h2>
 //   <p class="bio"><em>Software engineer passionate about clean code and minimal design. Loves open source and teaching.</em></p>
-//   <p class="slug">alice-smith</p>
+//   <p class="slug">alice-michu</p>
 //   <div class="tags">
 //     <span><strong>#JAVASCRIPT</strong></span>
 //     <span><strong>#REACT</strong></span>
@@ -771,29 +771,29 @@ Use **Strict Mode** to catch undefined variables and prevent typos from becoming
 | **Core Engine** | **950 bytes** |
 | + Partials Plugin (all 3 modes) | +800 bytes |
 | + Layout Plugin | +650 bytes |
-| + Helpers Plugin (with chaining) | +200 bytes |
 | + Strict Mode Plugin | +290 bytes |
 | + I18n Plugin | +230 bytes |
 | + Async Plugin | +260 bytes |
+| + Helpers Plugin (with chaining) | +150 bytes |
 | **All plugins combined** | **~3.3 kio** |
 
 ### Comparison with alternatives
 
-| Library | Size (gzipped) | Partials | Layouts | Dynamic Partials | Params Partials | Helpers | I18n | Async |
-|---------|---------------|----------|---------|------------------|-----------------|---------|------|-------|
-| **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **TemplateEngine (full)** | 3.3 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Mustache.js | 3.2 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| EJS | 7 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Handlebars | 26 kio | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Nunjucks | 32 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| Library | Size (gzipped) | Layouts | Partials | Dynamic Partials | Params Partials | Helpers | Helpers Chainable | Strict Mode | I18n | Async |
+|---------|---------------|----------|---------|------------------|-----------------|---------|-----------|-------------|------|-------|
+| **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **TemplateEngine (full)** | 3.3 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Mustache.js | 3.3 kio | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| EJS | 7 kio | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Handlebars | 26 kio | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Nunjucks | 32 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
 
 **TemplateEngine is:**
-- **Same size as Mustache.js** (core: 950 bytes vs 3.2 kio) **but with more features when using plugins**
+- **Same size as Mustache.js** (core: 950 bytes vs 3.3 kio) **but with more features when using plugins**
 - **2.1× lighter** than EJS (full: 3.3 kio vs 7 kio)
 - **7.9× lighter** than Handlebars (full: 3.3 kio vs 26 kio)
 - **9.7× lighter** than Nunjucks (full: 3.3 kio vs 32 kio)
-- **More features than Handlebars for ~8× less** (layouts + all features: 3.3 kio vs 26 kio)
+- **More features than Handlebars for ~8× less** (layouts + chainable helpers + all features: 3.3 kio vs 26 kio)
 
 ## Browser Support
 
