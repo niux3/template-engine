@@ -1,6 +1,6 @@
 {
   "name": "@niuxe/template-engine",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Ultra-lightweight JavaScript template engine with automatic HTML escaping, intelligent caching, and optional plugins (~950 bytes gzipped)",
   "type": "module",
   "main": "./dist/template-engine.js",
