@@ -1,11 +1,11 @@
 // Import TemplateEngine and plugins
 // Adjust these imports based on your actual build setup
-import { TemplateEngine } from '../../src/TemplateEngine.js'
-import { PartialsPlugin } from '../../src/plugins/partials.js'
-import { LayoutPlugin } from '../../src/plugins/layout.js'
-import { HelpersPlugin } from '../../src/plugins/helpers.js'
-import { I18nPlugin } from '../../src/plugins/i18n.js'
-import { StrictModePlugin } from '../../src/plugins/strict.js'
+import { TemplateEngine } from '@/TemplateEngine.js'
+import { PartialsPlugin } from '@/plugins/partials.js'
+import { LayoutPlugin } from '@/plugins/layout.js'
+import { HelpersPlugin } from '@/plugins/helpers.js'
+import { I18nPlugin } from '@/plugins/i18n.js'
+import { StrictModePlugin } from '@/plugins/strict.js'
 
 // ============================================================================
 // SECTION 1: BASIC USAGE
