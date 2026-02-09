@@ -34,7 +34,13 @@
                 <li><a href="#layout-multi">Layout multi level</a></li>
               </ul>
             </li>
-            <li><a href="#helpers">Helpers</a></li>
+            <li>
+              <span>Helpers</span>
+              <ul>
+                <li><a href="#helpers-basic">Basic</a></li>
+                <li><a href="#helpers-chain">Chainable</a></li>
+              </ul>
+            </li>
             <li><a href="#i18n">i18n</a></li>
             <li><a href="#strict">Strict</a></li>
           </ul>
@@ -393,10 +399,10 @@ const page = layoutEngine.render(`
         </div>
       </section>
 
-      <!-- Section 4: Helpers -->
-      <section id="helpers" class="section">
+      <!-- Section 4.1: Helpers -->
+      <section id="helpers-basic" class="section">
         <div class="section-header">
-          <span class="section-number">4</span>
+          <span class="section-number">4.1</span>
           <h2>Helpers Plugin</h2>
         </div>
 
@@ -439,24 +445,24 @@ const renderHelpers = function() {
   const helpersTemplate = `
 &lt;h3&gt;Product Catalog&lt;/h3&gt;
 &lt;div class="product-grid"&gt;
-[[ products.forEach(product =&gt; { ]]
-&lt;div class="product-card"&gt;
-&lt;div class="product-image"&gt;[[= product.emoji ]]&lt;/div&gt;
-&lt;div class="product-info"&gt;
-&lt;div class="product-title"&gt;[[= product.name ]]&lt;/div&gt;
-&lt;p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.5rem 0;"&gt;
-[[= helpers.truncate(product.description, 60) ]]
-&lt;/p&gt;
-&lt;div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;"&gt;
-&lt;div class="product-price"&gt;[[= helpers.currency(product.price) ]]&lt;/div&gt;
-[[-helpers.statusBadge(product.status) ]]
-&lt;/div&gt;
-&lt;div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;"&gt;
-Added: [[= helpers.formatDate(product.addedDate) ]]
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-[[ }) ]]
+  [[ products.forEach(product =&gt; { ]]
+  &lt;div class="product-card"&gt;
+    &lt;div class="product-image"&gt;[[= product.emoji ]]&lt;/div&gt;
+    &lt;div class="product-info"&gt;
+      &lt;div class="product-title"&gt;[[= product.name ]]&lt;/div&gt;
+      &lt;p style="color: var(--text-muted); font-size: 0.875rem; margin: 0.5rem 0;"&gt;
+        [[= helpers.truncate(product.description, 60) ]]
+      &lt;/p&gt;
+      &lt;div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;"&gt;
+        &lt;div class="product-price"&gt;[[= helpers.currency(product.price) ]]&lt;/div&gt;
+          [[-helpers.statusBadge(product.status) ]]
+        &lt;/div&gt;
+        &lt;div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;"&gt;
+          Added: [[= helpers.formatDate(product.addedDate) ]]
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  [[ }) ]]
 &lt;/div&gt;
 `
 
@@ -525,6 +531,116 @@ renderHelpers()
           <div class="demo-output" id="helpers-output"></div>
         </div>
       </section>
+<!-- Section 4.2: Chainable Helpers -->
+<section id="helpers-chain" class="section">
+  <div class="section-header">
+    <span class="section-number">4.2</span>
+    <h2>Chainable Helpers</h2>
+  </div>
+
+  <p style="color: var(--text-muted); margin-bottom: 2rem;">
+    Compose transformations Unix-style by chaining simple helpers together.
+  </p>
+
+  <div class="code-block">
+    <pre>
+const chainEngine = new TemplateEngine().use(HelpersPlugin)
+
+// Register simple, focused helpers
+chainEngine
+  .helper('upper', s => s.toUpperCase())
+  .helper('lower', s => s.toLowerCase())
+  .helper('trim', s => s.trim())
+  .helper('truncate', (s, len) => s.length > len ? s.slice(0, len) + '...' : s)
+  .helper('wrap', (s, tag) => `&lt;${tag}&gt;${s}&lt;/${tag}&gt;`)
+  .helper('slugify', s => s.toLowerCase().replace(/\s+/g, '-'))
+  .helper('prefix', (s, pre) => pre + s)
+
+// Standard usage
+const standard = chainEngine.render('[[= helpers.upper(text) ]]', { text: 'hello' })
+// Result: HELLO
+
+// Chainable composition
+const chained = chainEngine.render('[[= helpers(text).trim().upper().truncate(10) ]]',
+  { text: '  hello world  ' })
+// Result: HELLO WORL...
+
+// Complex chain with HTML
+const complex = chainEngine.render('[[-helpers(text).trim().upper().wrap("strong").wrap("em") ]]',
+  { text: '  hello  ' })
+// Result: &lt;em&gt;&lt;strong&gt;HELLO&lt;/strong&gt;&lt;/em&gt;
+
+const renderChain = function() {
+  const input = document.getElementById('chain-input').value
+
+  const template = `
+&lt;div style="background: var(--bg-lighter); padding: 2rem; border-radius: 8px;"&gt;
+  &lt;h3&gt;Input&lt;/h3&gt;
+  &lt;code style="background: var(--bg); padding: 0.5rem; border-radius: 4px; display: block; margin-bottom: 2rem;"&gt;"[[= text ]]"&lt;/code&gt;
+
+  &lt;h3&gt;Standard Helpers&lt;/h3&gt;
+  &lt;div style="margin-bottom: 2rem;"&gt;
+    &lt;p&gt;&lt;strong&gt;Upper:&lt;/strong&gt; [[= helpers.upper(text) ]]&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;Trimmed:&lt;/strong&gt; "[[= helpers.trim(text) ]]"&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;Slugified:&lt;/strong&gt; [[= helpers.slugify(text) ]]&lt;/p&gt;
+  &lt;/div&gt;
+
+  &lt;h3&gt;Chainable Composition&lt;/h3&gt;
+  &lt;div style="margin-bottom: 2rem;"&gt;
+    &lt;p&gt;&lt;strong&gt;trim().upper():&lt;/strong&gt; [[= helpers(text).trim().upper() ]]&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;trim().slugify():&lt;/strong&gt; [[= helpers(text).trim().slugify() ]]&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;trim().truncate(10).upper():&lt;/strong&gt; [[= helpers(text).trim().truncate(10).upper() ]]&lt;/p&gt;
+  &lt;/div&gt;
+
+  &lt;h3&gt;Complex Chain with HTML&lt;/h3&gt;
+  &lt;p&gt;[[-helpers(text).trim().upper().wrap("strong").wrap("em") ]]&lt;/p&gt;
+
+  &lt;h3&gt;User Card Example&lt;/h3&gt;
+  &lt;div class="card"&gt;
+    &lt;h4 style="margin-top: 0;"&gt;[[-helpers(user.name).trim().upper().wrap("strong") ]]&lt;/h4&gt;
+    &lt;p&gt;&lt;strong&gt;Bio:&lt;/strong&gt; [[-helpers(user.bio).trim().truncate(50).wrap("em") ]]&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;Slug:&lt;/strong&gt; &lt;code&gt;[[= helpers(user.name).trim().slugify() ]]&lt;/code&gt;&lt;/p&gt;
+    &lt;div style="margin-top: 0.5rem;"&gt;
+      [[ user.tags.forEach(tag => { ]]
+        &lt;span class="badge badge-success"&gt;[[-helpers(tag).upper().prefix("#") ]]&lt;/span&gt;
+      [[ }) ]]
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+`
+
+  const data = {
+    text: input,
+    user: {
+      name: input || 'John Doe',
+      bio: '  Software engineer passionate about clean code and minimal design. Loves open source.  ',
+      tags: ['javascript', 'templates', 'minimal']
+    }
+  }
+
+  document.getElementById('chain-output').innerHTML = chainEngine.render(template, data)
+}
+
+window.updateChainDemo = renderChain
+
+// Initial render
+renderChain()
+    </pre>
+  </div>
+
+  <div class="demo-container">
+    <div class="demo-controls">
+      <div class="input-group">
+        <label>Input text (try with spaces, uppercase, etc.):</label>
+        <input type="text" id="chain-input" value="  HELLO world from Template Engine  "
+               oninput="updateChainDemo()"
+               style="width: 100%; padding: 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: monospace;">
+      </div>
+    </div>
+    <div class="demo-output" id="chain-output"></div>
+  </div>
+</section>
+
 
       <!-- Section 5: i18n -->
       <section id="i18n" class="section">

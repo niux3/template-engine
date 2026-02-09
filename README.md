@@ -254,9 +254,9 @@ const page = engine.render(`
 - Email templates with consistent structure
 - Blog themes with customizable sections
 
-### Helpers Plugin (+150 bytes)
+### Helpers Plugin (+200 bytes)
 
-Custom functions for formatting and transforming data.
+Custom functions for formatting and transforming data with **chainable API**.
 
 ```javascript
 import { TemplateEngine } from '@niuxe/template-engine'
@@ -264,17 +264,36 @@ import { HelpersPlugin } from '@niuxe/template-engine/plugins/helpers'
 
 const engine = new TemplateEngine().use(HelpersPlugin)
 
-engine.helper('uppercase', str => str.toUpperCase())
+engine.helper('upper', str => str.toUpperCase())
+engine.helper('lower', str => str.toLowerCase())
+engine.helper('truncate', (str, len) => str.slice(0, len) + '...')
+engine.helper('wrap', (str, tag) => `<${tag}>${str}</${tag}>`)
 engine.helper('currency', price => `$${price.toFixed(2)}`)
 
-const html = engine.render(`
-  <h1>[[= helpers.uppercase(title) ]]</h1>
+// Standard usage
+const html1 = engine.render(`
+  <h1>[[= helpers.upper(title) ]]</h1>
   <p>Price: [[= helpers.currency(price) ]]</p>
 `, { title: 'hello', price: 19.99 })
 // Output: <h1>HELLO</h1><p>Price: $19.99</p>
+
+// Chainable usage - compose transformations Unix-style
+const html2 = engine.render(`
+  <h1>[[-helpers(title).upper().wrap('strong') ]]</h1>
+  <p>[[-helpers(description).truncate(50).lower().wrap('em') ]]</p>
+`, {
+  title: 'welcome',
+  description: 'THIS IS A VERY LONG DESCRIPTION THAT NEEDS TO BE SHORTENED'
+})
+// Output: <h1><strong>WELCOME</strong></h1>
+//         <p><em>this is a very long description that needs to be sho...</em></p>
 ```
 
-**Built-in helpers object:** `helpers.functionName(args)`
+**Features:**
+- **Standard mode**: `helpers.functionName(args)` - call helpers directly
+- **Chain mode**: `helpers(value).fn1().fn2()` - compose transformations
+- **Unix philosophy**: Each helper does one thing, chain them together
+- **Zero overhead**: Chainable proxy only created when needed
 
 ### Strict Mode Plugin (+290 bytes)
 
@@ -394,7 +413,7 @@ const html = engine.render(`
 `, { name: 'alice' })
 ```
 
-**Total size with all plugins:** ~3.2 kio gzipped
+**Total size with all plugins:** ~3.3 kio gzipped
 
 ## Core API
 
@@ -526,6 +545,62 @@ const blogPost = engine.render(`
 })
 ```
 
+### Data Transformation with Chainable Helpers
+
+```javascript
+import { TemplateEngine } from '@niuxe/template-engine'
+import { HelpersPlugin } from '@niuxe/template-engine/plugins/helpers'
+
+const engine = new TemplateEngine().use(HelpersPlugin)
+
+// Register simple, focused helpers (Unix philosophy)
+engine
+  .helper('upper', s => s.toUpperCase())
+  .helper('lower', s => s.toLowerCase())
+  .helper('truncate', (s, len) => s.length > len ? s.slice(0, len) + '...' : s)
+  .helper('trim', s => s.trim())
+  .helper('slugify', s => s.toLowerCase().replace(/\s+/g, '-'))
+  .helper('wrap', (s, tag) => `<${tag}>${s}</${tag}>`)
+  .helper('prefix', (s, pre) => pre + s)
+
+// Compose transformations by chaining
+const userCard = engine.render(`
+  <div class="user-card">
+    <!-- Standard helper usage -->
+    <h2>[[= helpers.upper(user.name) ]]</h2>
+
+    <!-- Chainable composition -->
+    <p class="bio">[[-helpers(user.bio).trim().truncate(100).wrap('em') ]]</p>
+    <p class="slug">[[= helpers(user.name).lower().slugify() ]]</p>
+
+    <!-- Complex chains -->
+    <div class="tags">
+    [[ user.tags.forEach(tag => { ]]
+      <span>[[-helpers(tag).upper().prefix('#').wrap('strong') ]]</span>
+    [[ }) ]]
+    </div>
+  </div>
+`, {
+  user: {
+    name: 'Alice Michu',
+    bio: '  Software engineer passionate about clean code and minimal design. Loves open source and teaching.  ',
+    tags: ['javascript', 'react', 'node']
+  }
+})
+
+// Output:
+// <div class="user-card">
+//   <h2>ALICE MICHU</h2>
+//   <p class="bio"><em>Software engineer passionate about clean code and minimal design. Loves open source and teaching.</em></p>
+//   <p class="slug">alice-michu</p>
+//   <div class="tags">
+//     <span><strong>#JAVASCRIPT</strong></span>
+//     <span><strong>#REACT</strong></span>
+//     <span><strong>#NODE</strong></span>
+//   </div>
+// </div>
+```
+
 ### Component Library with Dynamic Partials
 
 ```javascript
@@ -577,7 +652,8 @@ const engine = new TemplateEngine()
   .use(HelpersPlugin)
 
 engine.helper('currency', price => `$${price.toFixed(2)}`)
-
+engine.helper('upper', str => str.toUpperCase())
+engine.helper('truncate', (str, len) => str.length > len ? str.slice(0, len) + '...' : str)
 // Email base layout
 engine.layout('email', `
   <!DOCTYPE html>
@@ -611,7 +687,7 @@ const email = engine.render(`
   [[block:content]]
     <div style="padding: 20px;">
       <h2>Order Confirmation</h2>
-      <p>Hi [[= userName ]],</p>
+      <p>Hi [[= helpers(userName).upper() ]],</p>
       <p>Your order #[[= orderId ]] has been confirmed.</p>
 
       <table style="width: 100%; border-collapse: collapse;">
@@ -624,7 +700,7 @@ const email = engine.render(`
         <tbody>
         [[ items.forEach(item => { ]]
           <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 10px;">[[= item.name ]]</td>
+            <td style="padding: 10px;">[[= helpers(item.name).truncate(30) ]]</td>
             <td style="text-align: right; padding: 10px;">[[= helpers.currency(item.price) ]]</td>
           </tr>
         [[ }) ]]
@@ -695,29 +771,29 @@ Use **Strict Mode** to catch undefined variables and prevent typos from becoming
 | **Core Engine** | **950 bytes** |
 | + Partials Plugin (all 3 modes) | +800 bytes |
 | + Layout Plugin | +650 bytes |
-| + Helpers Plugin | +150 bytes |
 | + Strict Mode Plugin | +290 bytes |
 | + I18n Plugin | +230 bytes |
 | + Async Plugin | +260 bytes |
-| **All plugins combined** | **~3.2 kio** |
+| + Helpers Plugin (with chaining) | +150 bytes |
+| **All plugins combined** | **~3.3 kio** |
 
 ### Comparison with alternatives
 
-| Library | Size (gzipped) | Partials | Layouts | Dynamic Partials | Params Partials | Helpers | I18n | Async |
-|---------|---------------|----------|---------|------------------|-----------------|---------|------|-------|
-| **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **TemplateEngine (full)** | 3.2 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Mustache.js | 3.2 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| EJS | 7 kio | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Handlebars | 26 kio | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Nunjucks | 32 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| Library | Size (gzipped) | Layouts | Partials | Dynamic Partials | Params Partials | Helpers | Helpers Chainable | Strict Mode | I18n | Async |
+|---------|---------------|----------|---------|------------------|-----------------|---------|-----------|-------------|------|-------|
+| **TemplateEngine (core)** | 950 bytes | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **TemplateEngine (full)** | 3.3 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Mustache.js | 3.3 kio | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| EJS | 7 kio | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Handlebars | 26 kio | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Nunjucks | 32 kio | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
 
 **TemplateEngine is:**
-- **Same size as Mustache.js** (core: 950 bytes vs 3.2 kio) **but with more features when using plugins**
-- **2.2× lighter** than EJS (full: 3.2 kio vs 7 kio)
-- **8× lighter** than Handlebars (full: 3.2 kio vs 26 kio)
-- **10× lighter** than Nunjucks (full: 3.2 kio vs 32 kio)
-- **More features than Handlebars for 8× less** (layouts + all features: 3.2 kio vs 26 kio)
+- **Same size as Mustache.js** (core: 950 bytes vs 3.3 kio) **but with more features when using plugins**
+- **2.1× lighter** than EJS (full: 3.3 kio vs 7 kio)
+- **7.9× lighter** than Handlebars (full: 3.3 kio vs 26 kio)
+- **9.7× lighter** than Nunjucks (full: 3.3 kio vs 32 kio)
+- **More features than Handlebars for ~8× less** (layouts + chainable helpers + all features: 3.3 kio vs 26 kio)
 
 ## Browser Support
 

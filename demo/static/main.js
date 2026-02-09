@@ -1,11 +1,11 @@
 // Import TemplateEngine and plugins
 // Adjust these imports based on your actual build setup
-import { TemplateEngine } from '../../src/TemplateEngine.js'
-import { PartialsPlugin } from '../../src/plugins/partials.js'
-import { LayoutPlugin } from '../../src/plugins/layout.js'
-import { HelpersPlugin } from '../../src/plugins/helpers.js'
-import { I18nPlugin } from '../../src/plugins/i18n.js'
-import { StrictModePlugin } from '../../src/plugins/strict.js'
+import { TemplateEngine } from '@/TemplateEngine.js'
+import { PartialsPlugin } from '@/plugins/partials.js'
+import { LayoutPlugin } from '@/plugins/layout.js'
+import { HelpersPlugin } from '@/plugins/helpers.js'
+import { I18nPlugin } from '@/plugins/i18n.js'
+import { StrictModePlugin } from '@/plugins/strict.js'
 
 // ============================================================================
 // SECTION 1: BASIC USAGE
@@ -628,7 +628,7 @@ window.switchAdminPage = function(page) {
 renderMultiLayout()
 
 // ============================================================================
-// SECTION 4: HELPERS
+// SECTION 4.1: HELPERS BASIC
 // ============================================================================
 
 const helpersEngine = new TemplateEngine().use(HelpersPlugin)
@@ -747,6 +747,79 @@ window.renderHelpers = function() {
 
 // Auto-render on load
 renderHelpers()
+
+// ============================================================================
+// SECTION 4.2: HELPERS CHAINABLE
+// ============================================================================
+const chainEngine = new TemplateEngine().use(HelpersPlugin)
+
+chainEngine
+    .helper('upper', s => s.toUpperCase())
+    .helper('lower', s => s.toLowerCase())
+    .helper('trim', s => s.trim())
+    .helper('truncate', (s, len) => s.length > len ? s.slice(0, len) + '...' : s)
+    .helper('wrap', (s, tag) => `<${tag}>${s}</${tag}>`)
+    .helper('slugify', s => s.toLowerCase().replace(/\s+/g, '-'))
+    .helper('prefix', (s, pre) => pre + s)
+
+const renderChain = function() {
+    const input = document.getElementById('chain-input').value
+    console.log(input)
+
+    const template = `
+<div style="background: var(--bg-lighter); padding: 2rem; border-radius: 8px;">
+  <h3>Input</h3>
+  <code style="background: var(--bg); padding: 0.5rem; border-radius: 4px; display: block; margin-bottom: 2rem;">"[[= text ]]"</code>
+
+  <h3>Standard Helpers</h3>
+  <div style="margin-bottom: 2rem;">
+    <p><strong>Upper:</strong> [[= helpers.upper(text) ]]</p>
+    <p><strong>Trimmed:</strong> "[[= helpers.trim(text) ]]"</p>
+    <p><strong>Slugified:</strong> [[= helpers.slugify(text) ]]</p>
+  </div>
+
+  <h3>Chainable Composition</h3>
+  <div style="margin-bottom: 2rem;">
+    <p><strong>trim().upper():</strong> [[= helpers(text).trim().upper() ]]</p>
+    <p><strong>trim().slugify():</strong> [[= helpers(text).trim().slugify() ]]</p>
+    <p><strong>trim().truncate(10).upper():</strong> [[= helpers(text).trim().truncate(10).upper() ]]</p>
+  </div>
+
+  <h3>Complex Chain with HTML</h3>
+  <p>[[-helpers(text).trim().upper().wrap("strong").wrap("em") ]]</p>
+
+  <h3>User Card Example</h3>
+  <div class="card">
+    <h4 style="margin-top: 0;">[[-helpers(user.name).trim().upper().wrap("strong") ]]</h4>
+    <p><strong>Bio:</strong> [[-helpers(user.bio).trim().truncate(50).wrap("em") ]]</p>
+    <p><strong>Slug:</strong> <code>[[= helpers(user.name).trim().slugify() ]]</code></p>
+    <div style="margin-top: 0.5rem;">
+      [[ user.tags.forEach(tag => { ]]
+        <span class="badge badge-success">[[-helpers(tag).upper().prefix("#") ]]</span>
+      [[ }) ]]
+    </div>
+  </div>
+</div>
+`
+
+    const data = {
+        text: input,
+        user: {
+            name: input || 'Robert Michu',
+            bio: '  Software engineer passionate about clean code and minimal design. Loves open source.  ',
+            tags: ['javascript', 'templates', 'minimal']
+        }
+    }
+
+    document.getElementById('chain-output').innerHTML = chainEngine.render(template, data)
+}
+
+// window.updateChainDemo = renderChain
+
+renderChain()
+
+
+
 
 // ============================================================================
 // SECTION 5: i18n

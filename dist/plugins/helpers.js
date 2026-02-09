@@ -1,1 +1,1 @@
-const x=(a,s)=>{const e={};a.helper=(r,t)=>(e[r]=t,a),s.extraParams||(s.extraParams=[]),s.extraParams.push("helpers"),s.extraArgs||(s.extraArgs=[]),s.extraArgs.push(e)};export{x as HelpersPlugin};
+const l=(p,t)=>{const o={};p.helper=(r,e)=>(o[r]=e,p);const s=r=>new Proxy({_:r},{get:(e,a)=>a==="valueOf"||a==="toString"?()=>e._:o[a]?(...g)=>s(o[a](e._,...g)):void 0}),x=new Proxy(s,{get:(r,e)=>o[e]||r[e],apply:(r,e,a)=>r(...a)});t.extraParams||(t.extraParams=[]),t.extraParams.push("helpers"),t.extraArgs||(t.extraArgs=[]),t.extraArgs.push(x)};export{l as HelpersPlugin};

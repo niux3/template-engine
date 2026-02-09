@@ -102,6 +102,7 @@
   },
   "homepage": "https://github.com/niux3/template-engine#readme",
   "devDependencies": {
+    "@vitest/coverage-v8": "4.0.17",
     "@vitest/ui": "4.0.17",
     "esbuild": "^0.27.2",
     "vite": "^7.2.4",
